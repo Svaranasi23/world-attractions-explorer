@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated files (optional - you may want to include these)
+# *.html
+# *.png
+# *.csv
+
+# Keep the important files but ignore large generated ones if needed
+# Uncomment if you don't want to track generated HTML/images
+# US_National_Parks_Interactive_Map.html
+# *.png
+

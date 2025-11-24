@@ -1,0 +1,66 @@
+IATA,Name,City,State,Country,Latitude,Longitude
+ATL,Hartsfield-Jackson Atlanta International,Atlanta,GA,United States,33.6407,-84.4277
+LAX,Los Angeles International,Los Angeles,CA,United States,33.9425,-118.4081
+ORD,O'Hare International,Chicago,IL,United States,41.9786,-87.9048
+DFW,Dallas/Fort Worth International,Dallas,TX,United States,32.8969,-97.0381
+DEN,Denver International,Denver,CO,United States,39.8617,-104.6731
+JFK,John F. Kennedy International,New York,NY,United States,40.6413,-73.7781
+SFO,San Francisco International,San Francisco,CA,United States,37.6213,-122.3790
+SEA,Seattle-Tacoma International,Seattle,WA,United States,47.4502,-122.3088
+LAS,McCarran International,Las Vegas,NV,United States,36.0840,-115.1537
+MIA,Miami International,Miami,FL,United States,25.7959,-80.2870
+CLT,Charlotte Douglas International,Charlotte,NC,United States,35.2144,-80.9473
+PHX,Phoenix Sky Harbor International,Phoenix,AZ,United States,33.4342,-112.0116
+EWR,Newark Liberty International,Newark,NJ,United States,40.6895,-74.1745
+IAH,George Bush Intercontinental,Houston,TX,United States,29.9902,-95.3368
+MCO,Orlando International,Orlando,FL,United States,28.4312,-81.3083
+MSP,Minneapolis-Saint Paul International,Minneapolis,MN,United States,44.8848,-93.2223
+DTW,Detroit Metropolitan,Detroit,MI,United States,42.2162,-83.3554
+PHL,Philadelphia International,Philadelphia,PA,United States,39.8719,-75.2411
+LGA,LaGuardia,New York,NY,United States,40.7769,-73.8740
+BWI,Baltimore/Washington International,Baltimore,MD,United States,39.1774,-76.6684
+SLC,Salt Lake City International,Salt Lake City,UT,United States,40.7899,-111.9791
+DCA,Ronald Reagan Washington National,Washington,DC,United States,38.8512,-77.0402
+MDW,Chicago Midway International,Chicago,IL,United States,41.7868,-87.7522
+HNL,Daniel K. Inouye International,Honolulu,HI,United States,21.3206,-157.9242
+ANC,Ted Stevens Anchorage International,Anchorage,AK,United States,61.1743,-149.9962
+BOS,Logan International,Boston,MA,United States,42.3656,-71.0096
+IAD,Washington Dulles International,Washington,VA,United States,38.9531,-77.4565
+FLL,Fort Lauderdale-Hollywood International,Fort Lauderdale,FL,United States,26.0726,-80.1528
+PDX,Portland International,Portland,OR,United States,45.5898,-122.5951
+STL,St. Louis Lambert International,St. Louis,MO,United States,38.7487,-90.3700
+SAN,San Diego International,San Diego,CA,United States,32.7338,-117.1933
+TPA,Tampa International,Tampa,FL,United States,27.9755,-82.5332
+BNA,Nashville International,Nashville,TN,United States,36.1245,-86.6782
+AUS,Austin-Bergstrom International,Austin,TX,United States,30.1945,-97.6699
+OAK,Oakland International,Oakland,CA,United States,37.7213,-122.2207
+MSY,Louis Armstrong New Orleans International,New Orleans,LA,United States,29.9934,-90.2581
+RDU,Raleigh-Durham International,Raleigh,NC,United States,35.8776,-78.7875
+CLE,Cleveland Hopkins International,Cleveland,OH,United States,41.4117,-81.8498
+IND,Indianapolis International,Indianapolis,IN,United States,39.7173,-86.2944
+CMH,John Glenn Columbus International,Columbus,OH,United States,39.9980,-82.8919
+MCI,Kansas City International,Kansas City,MO,United States,39.2976,-94.7139
+SJC,Norman Y. Mineta San Jose International,San Jose,CA,United States,37.3626,-121.9290
+SMF,Sacramento International,Sacramento,CA,United States,38.6954,-121.5908
+PIT,Pittsburgh International,Pittsburgh,PA,United States,40.4915,-80.2329
+MKE,General Mitchell International,Milwaukee,WI,United States,42.9472,-87.8966
+BUF,Buffalo Niagara International,Buffalo,NY,United States,42.9405,-78.7322
+JAX,Jacksonville International,Jacksonville,FL,United States,30.4941,-81.6879
+BUR,Hollywood Burbank,Burbank,CA,United States,34.2006,-118.3587
+ABQ,Albuquerque International Sunport,Albuquerque,NM,United States,35.0402,-106.6092
+BOI,Boise Airport,Boise,ID,United States,43.5644,-116.2228
+OGG,Kahului Airport,Kahului,HI,United States,20.8986,-156.4306
+YYZ,Toronto Pearson International,Toronto,ON,Canada,43.6772,-79.6306
+YVR,Vancouver International,Vancouver,BC,Canada,49.1947,-123.1792
+YUL,Montréal-Pierre Elliott Trudeau International,Montreal,QC,Canada,45.4577,-73.7497
+YYC,Calgary International,Calgary,AB,Canada,51.1215,-114.0076
+YEG,Edmonton International,Edmonton,AB,Canada,53.3097,-113.5797
+YOW,Ottawa Macdonald-Cartier International,Ottawa,ON,Canada,45.3225,-75.6692
+YHZ,Halifax Stanfield International,Halifax,NS,Canada,44.8808,-63.5086
+YWG,Winnipeg James Armstrong Richardson International,Winnipeg,MB,Canada,49.9100,-97.2399
+YQB,Québec City Jean Lesage International,Quebec City,QC,Canada,46.7911,-71.3933
+YQR,Regina International,Regina,SK,Canada,50.4319,-104.6658
+YQT,Thunder Bay International,Thunder Bay,ON,Canada,48.3719,-89.3239
+YFC,Fredericton International,Fredericton,NB,Canada,45.8689,-66.5372
+YXY,Erik Nielsen Whitehorse International,Whitehorse,YT,Canada,60.7096,-135.0673
+YFB,Iqaluit Airport,Iqaluit,NU,Canada,63.7567,-68.5558
