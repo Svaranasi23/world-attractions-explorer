@@ -6,54 +6,8 @@ def get_nepal_temples():
     """
     
     nepal_temples = [
-        {
-            'Park_Code': 'PAS',
-            'Name': 'Pashupatinath Temple',
-            'Designation': 'Hindu Temple',
-            'States': 'Kathmandu',
-            'Latitude': '27.7106',
-            'Longitude': '85.3486',
-            'Description': 'Pashupatinath Temple - UNESCO World Heritage Site. One of the most sacred Hindu temples dedicated to Lord Shiva.',
-            'URL': 'https://en.wikipedia.org/wiki/Pashupatinath_Temple',
-            'Country': 'Nepal',
-            'Temple_Type': 'Hindu'
-        },
-        {
-            'Park_Code': 'SWA',
-            'Name': 'Swayambhunath Stupa',
-            'Designation': 'Buddhist Temple',
-            'States': 'Kathmandu',
-            'Latitude': '27.7147',
-            'Longitude': '85.2903',
-            'Description': 'Swayambhunath Stupa - UNESCO World Heritage Site. Ancient Buddhist stupa, also known as Monkey Temple.',
-            'URL': 'https://en.wikipedia.org/wiki/Swayambhunath',
-            'Country': 'Nepal',
-            'Temple_Type': 'Buddhist'
-        },
-        {
-            'Park_Code': 'BOU',
-            'Name': 'Boudhanath Stupa',
-            'Designation': 'Buddhist Temple',
-            'States': 'Kathmandu',
-            'Latitude': '27.7214',
-            'Longitude': '85.3622',
-            'Description': 'Boudhanath Stupa - UNESCO World Heritage Site. One of the largest spherical stupas in Nepal.',
-            'URL': 'https://en.wikipedia.org/wiki/Boudhanath',
-            'Country': 'Nepal',
-            'Temple_Type': 'Buddhist'
-        },
-        {
-            'Park_Code': 'CHA',
-            'Name': 'Changu Narayan Temple',
-            'Designation': 'Hindu Temple',
-            'States': 'Bhaktapur',
-            'Latitude': '27.7144',
-            'Longitude': '85.4281',
-            'Description': 'Changu Narayan Temple - UNESCO World Heritage Site. Oldest temple in Nepal dedicated to Lord Vishnu.',
-            'URL': 'https://en.wikipedia.org/wiki/Changu_Narayan_Temple',
-            'Country': 'Nepal',
-            'Temple_Type': 'Hindu'
-        },
+        # Note: Pashupatinath (PAS), Swayambhunath (SWA), Boudhanath (BOU), and Changu Narayan (CHA)
+        # are part of Kathmandu Valley UNESCO site, removed from here
         {
             'Park_Code': 'MUK',
             'Name': 'Muktinath Temple',

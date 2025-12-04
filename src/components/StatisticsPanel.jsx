@@ -86,7 +86,8 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
                                  (regions['India-ShaktiPeetha']?.length || 0) + 
                                  (regions['India-OtherTemples']?.length || 0) + 
                                  (regions['India-Mutts']?.length || 0) + 
-                                 (regions['India-DivyaDesam']?.length || 0)
+                                 (regions['India-DivyaDesam']?.length || 0) + 
+                                 (regions['India-Forts']?.length || 0)
 
   return (
     <div className="statistics-panel">
@@ -178,6 +179,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
                 <li>🕉️ Major Temples: {regions['India-OtherTemples']?.length || 0}</li>
                 <li>🏛️ Maths: {regions['India-Mutts']?.length || 0}</li>
                 <li>🐚 Divya Desams: {regions['India-DivyaDesam']?.length || 0}</li>
+                <li>🏰 Historic Forts: {regions['India-Forts']?.length || 0}</li>
               </ul>
               {stats.topIndiaStates.length > 0 && (
                 <div>
@@ -206,10 +208,12 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           </div>
           {expandedCountries['Nepal'] && (
             <div className="country-details">
-              <p>Total Attractions: {(regions['Nepal-Parks']?.length || 0) + (regions['Nepal-Temples']?.length || 0)}</p>
+              <p>Total Attractions: {(regions['Nepal-Parks']?.length || 0) + (regions['Nepal-Temples']?.length || 0) + (regions['Nepal-UNESCO']?.length || 0) + (regions['Nepal-TrekkingFlights']?.length || 0)}</p>
               <ul>
                 <li>🏞️ Parks: {regions['Nepal-Parks']?.length || 0}</li>
                 <li>🛕 Temples: {regions['Nepal-Temples']?.length || 0}</li>
+                <li>🏛️ UNESCO Sites: {regions['Nepal-UNESCO']?.length || 0}</li>
+                <li>⛰️ Trekking & Flights: {regions['Nepal-TrekkingFlights']?.length || 0}</li>
               </ul>
               {stats.topNepalStates.length > 0 && (
                 <div>

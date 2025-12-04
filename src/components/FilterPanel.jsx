@@ -15,12 +15,12 @@ function FilterPanel({ regions, visibleRegions, toggleRegion, toggleAllUSRegions
   const totalIndiaParks = (regions['India-Parks']?.length || 0) + (regions['India-UNESCO']?.length || 0) + (regions['India-Jyotirlinga']?.length || 0) + (regions['India-ShaktiPeetha']?.length || 0) + (regions['India-OtherTemples']?.length || 0) + (regions['India-Mutts']?.length || 0) + (regions['India-DivyaDesam']?.length || 0) + (regions['India-Forts']?.length || 0)
   const allIndiaVisible = areAllIndiaRegionsVisible()
   
-  const nepalSubRegions = ['Nepal-Parks', 'Nepal-Temples', 'Nepal-UNESCO']
-  const totalNepalSites = (regions['Nepal-Parks']?.length || 0) + (regions['Nepal-Temples']?.length || 0) + (regions['Nepal-UNESCO']?.length || 0)
+  const nepalSubRegions = ['Nepal-Parks', 'Nepal-Temples', 'Nepal-UNESCO', 'Nepal-TrekkingFlights']
+  const totalNepalSites = (regions['Nepal-Parks']?.length || 0) + (regions['Nepal-Temples']?.length || 0) + (regions['Nepal-UNESCO']?.length || 0) + (regions['Nepal-TrekkingFlights']?.length || 0)
   const allNepalVisible = areAllNepalRegionsVisible()
   
-  const sriLankaSubRegions = ['Sri Lanka-Parks', 'Sri Lanka-Temples', 'Sri Lanka-UNESCO']
-  const totalSriLankaSites = (regions['Sri Lanka-Parks']?.length || 0) + (regions['Sri Lanka-Temples']?.length || 0) + (regions['Sri Lanka-UNESCO']?.length || 0)
+  const sriLankaSubRegions = ['Sri Lanka-Parks', 'Sri Lanka-Temples']
+  const totalSriLankaSites = (regions['Sri Lanka-Parks']?.length || 0) + (regions['Sri Lanka-Temples']?.length || 0)
   const allSriLankaVisible = areAllSriLankaRegionsVisible()
 
   const handleRegionToggle = (region, checked) => {
@@ -202,7 +202,7 @@ function FilterPanel({ regions, visibleRegions, toggleRegion, toggleAllUSRegions
             )}
             
             {/* Nepal as top-level filter with sub-filters */}
-            {(regions['Nepal-Parks'] || regions['Nepal-Temples'] || regions['Nepal-UNESCO']) && (
+            {(regions['Nepal-Parks'] || regions['Nepal-Temples']) && (
               <div className="nepal-filter-group">
                 <div className="nepal-header" onClick={() => setNepalExpanded(!nepalExpanded)}>
                   <label className="filter-item nepal-parent" onClick={(e) => e.stopPropagation()}>
@@ -249,13 +249,23 @@ function FilterPanel({ regions, visibleRegions, toggleRegion, toggleAllUSRegions
                         <span>🏛️ UNESCO Sites</span> ({regions['Nepal-UNESCO'].length} sites)
                       </label>
                     )}
+                    {regions['Nepal-TrekkingFlights'] && (
+                      <label key="Nepal-TrekkingFlights" className="filter-item nested-item">
+                        <input
+                          type="checkbox"
+                          checked={visibleRegions['Nepal-TrekkingFlights'] !== false}
+                          onChange={(e) => handleRegionToggle('Nepal-TrekkingFlights', e.target.checked)}
+                        />
+                        <span>⛰️ Trekking & Flights</span> ({regions['Nepal-TrekkingFlights'].length} activities)
+                      </label>
+                    )}
                   </div>
                 )}
               </div>
             )}
             
             {/* Sri Lanka as top-level filter with sub-filters */}
-            {(regions['Sri Lanka-Parks'] || regions['Sri Lanka-Temples'] || regions['Sri Lanka-UNESCO']) && (
+            {(regions['Sri Lanka-Parks'] || regions['Sri Lanka-Temples']) && (
               <div className="sri-lanka-filter-group">
                 <div className="sri-lanka-header" onClick={() => setSriLankaExpanded(!sriLankaExpanded)}>
                   <label className="filter-item sri-lanka-parent" onClick={(e) => e.stopPropagation()}>
@@ -290,16 +300,6 @@ function FilterPanel({ regions, visibleRegions, toggleRegion, toggleAllUSRegions
                           onChange={(e) => handleRegionToggle('Sri Lanka-Temples', e.target.checked)}
                         />
                         <span>🕉️ Temples</span> ({regions['Sri Lanka-Temples'].length} temples)
-                      </label>
-                    )}
-                    {regions['Sri Lanka-UNESCO'] && (
-                      <label key="Sri Lanka-UNESCO" className="filter-item nested-item">
-                        <input
-                          type="checkbox"
-                          checked={visibleRegions['Sri Lanka-UNESCO'] !== false}
-                          onChange={(e) => handleRegionToggle('Sri Lanka-UNESCO', e.target.checked)}
-                        />
-                        <span>🏛️ UNESCO Sites</span> ({regions['Sri Lanka-UNESCO'].length} sites)
                       </label>
                     )}
                   </div>

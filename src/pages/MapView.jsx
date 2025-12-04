@@ -189,9 +189,9 @@ function MapView() {
     'Nepal-Parks': true,
     'Nepal-Temples': true,
     'Nepal-UNESCO': true,
+    'Nepal-TrekkingFlights': true,
     'Sri Lanka-Parks': true,
     'Sri Lanka-Temples': true,
-    'Sri Lanka-UNESCO': true,
     'Costa Rica': true
   })
   const [showHeatMap, setShowHeatMap] = useState(false)
@@ -329,10 +329,12 @@ function MapView() {
       } else if (country === 'Nepal') {
         // Use NepalCategory to determine sub-region - ensure all Nepal parks get a region
         // If NepalCategory is missing or invalid, default to Nepal-Parks
-        if (park.NepalCategory === 'Temples') {
-          region = 'Nepal-Temples'
-        } else if (park.NepalCategory === 'UNESCO') {
+        if (park.NepalCategory === 'UNESCO') {
           region = 'Nepal-UNESCO'
+        } else if (park.NepalCategory === 'Temples') {
+          region = 'Nepal-Temples'
+        } else if (park.NepalCategory === 'TrekkingFlights') {
+          region = 'Nepal-TrekkingFlights'
         } else {
           // Default to Nepal-Parks for all other Nepal entries
           region = 'Nepal-Parks'
@@ -341,8 +343,6 @@ function MapView() {
         // Use SriLankaCategory to determine sub-region
         if (park.SriLankaCategory === 'Temples') {
           region = 'Sri Lanka-Temples'
-        } else if (park.SriLankaCategory === 'UNESCO') {
-          region = 'Sri Lanka-UNESCO'
         } else {
           region = 'Sri Lanka-Parks'
         }
@@ -399,9 +399,10 @@ function MapView() {
     .filter(park => {
       // Final safety filter: explicitly remove any Nepal parks if their regions are not visible
       if (park.Country === 'Nepal') {
-        const isNepalPark = !park.NepalCategory || (park.NepalCategory !== 'Temples' && park.NepalCategory !== 'UNESCO')
+        const isNepalPark = !park.NepalCategory || (park.NepalCategory !== 'Temples' && park.NepalCategory !== 'UNESCO' && park.NepalCategory !== 'TrekkingFlights')
         const isNepalTemple = park.NepalCategory === 'Temples'
         const isNepalUnesco = park.NepalCategory === 'UNESCO'
+        const isNepalTrekkingFlights = park.NepalCategory === 'TrekkingFlights'
         
         if (isNepalPark && visibleRegions['Nepal-Parks'] !== true) {
           return false
@@ -410,6 +411,9 @@ function MapView() {
           return false
         }
         if (isNepalUnesco && visibleRegions['Nepal-UNESCO'] !== true) {
+          return false
+        }
+        if (isNepalTrekkingFlights && visibleRegions['Nepal-TrekkingFlights'] !== true) {
           return false
         }
       }
@@ -547,10 +551,10 @@ function MapView() {
         'Nepal-Parks': { center: [28.3949, 84.1240], zoom: 7 },
         'Nepal-Temples': { center: [27.7172, 85.3240], zoom: 8 },
         'Nepal-UNESCO': { center: [27.7172, 85.3240], zoom: 7 },
+        'Nepal-TrekkingFlights': { center: [28.3949, 84.1240], zoom: 7 },
         'Sri Lanka': { center: [7.8731, 80.7718], zoom: 7 },
         'Sri Lanka-Parks': { center: [7.8731, 80.7718], zoom: 7 },
         'Sri Lanka-Temples': { center: [7.2944, 80.6414], zoom: 8 },
-        'Sri Lanka-UNESCO': { center: [7.8731, 80.7718], zoom: 7 },
         'Costa Rica': { center: [9.7489, -83.7534], zoom: 7 }
       }
       return countryCenters[regionName] || null
@@ -625,7 +629,7 @@ function MapView() {
   }
 
   const toggleAllNepalRegions = (show, shouldFocus = false) => {
-    const nepalRegions = ['Nepal-Parks', 'Nepal-Temples']
+    const nepalRegions = ['Nepal-Parks', 'Nepal-Temples', 'Nepal-UNESCO', 'Nepal-TrekkingFlights']
     setVisibleRegions(prev => {
       const updated = { ...prev }
       nepalRegions.forEach(region => {
@@ -639,7 +643,7 @@ function MapView() {
   }
 
   const areAllNepalRegionsVisible = () => {
-    const nepalRegions = ['Nepal-Parks', 'Nepal-Temples', 'Nepal-UNESCO']
+    const nepalRegions = ['Nepal-Parks', 'Nepal-Temples', 'Nepal-UNESCO', 'Nepal-TrekkingFlights']
     return nepalRegions.every(region => visibleRegions[region] !== false)
   }
 
@@ -658,7 +662,7 @@ function MapView() {
   }
 
   const areAllSriLankaRegionsVisible = () => {
-    const sriLankaRegions = ['Sri Lanka-Parks', 'Sri Lanka-Temples', 'Sri Lanka-UNESCO']
+    const sriLankaRegions = ['Sri Lanka-Parks', 'Sri Lanka-Temples']
     return sriLankaRegions.every(region => visibleRegions[region] !== false)
   }
 
@@ -668,17 +672,17 @@ function MapView() {
                           (park.Designation && park.Designation.includes('Jyotirlinga'))
     
     if (isJyotirlinga) {
-      // Use custom Jyotirlinga icon with trishul emoji (🔱)
+      // Use custom Jyotirlinga icon with trishul emoji (🔱) - saffron color
       // Trishul is Shiva's divine weapon - a three-pronged spear
       return L.divIcon({
         className: 'jyotirlinga-marker',
         html: `<div style="
-          background-color: #F44336;
+          background-color: #FF9933;
           width: 30px;
           height: 30px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #D32F2F;
+          border: 3px solid #FF8C00;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -703,16 +707,16 @@ function MapView() {
                            (park.Designation && park.Designation.includes('Shakti Peetha'))
     
     if (isShaktiPeetha) {
-      // Use custom Shakti Peetha icon with lotus emoji (🌸) - pink color
+      // Use custom Shakti Peetha icon with lotus emoji (🌸) - saffron color
       return L.divIcon({
         className: 'shakti-peetha-marker',
         html: `<div style="
-          background-color: #E91E63;
+          background-color: #FF9933;
           width: 30px;
           height: 30px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #C2185B;
+          border: 3px solid #FF8C00;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -777,16 +781,16 @@ function MapView() {
                          (park.Designation && park.Designation.includes('Divya Desam'))
     
     if (isDivyaDesam) {
-      // Use custom Divya Desam icon with conch shell emoji (🐚) - blue color
+      // Use custom Divya Desam icon with conch shell emoji (🐚) - saffron color
       return L.divIcon({
         className: 'divya-desam-marker',
         html: `<div style="
-          background-color: #2196F3;
+          background-color: #FF9933;
           width: 30px;
           height: 30px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #1976D2;
+          border: 3px solid #FF8C00;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -874,21 +878,20 @@ function MapView() {
       })
     }
     
-    // Check if it's a Nepal or Sri Lanka UNESCO site
+    // Check if it's a Nepal UNESCO site
     const isNepalUnesco = park.NepalCategory === 'UNESCO'
-    const isSriLankaUnesco = park.SriLankaCategory === 'UNESCO'
     
-    if (isNepalUnesco || isSriLankaUnesco) {
-      // Use UNESCO icon (🏛️) with light violet color (same as India UNESCO)
+    if (isNepalUnesco) {
+      // Use custom Nepal UNESCO icon with monument emoji (🏛️) - light blue color
       return L.divIcon({
-        className: 'unesco-marker',
+        className: 'nepal-unesco-marker',
         html: `<div style="
-          background-color: #CE93D8;
+          background-color: #81D4FA;
           width: 30px;
           height: 30px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #BA68C8;
+          border: 3px solid #4FC3F7;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -908,30 +911,54 @@ function MapView() {
       })
     }
     
+    // Check if it's a Nepal Trekking Route or Mountain Flight
+    const isNepalTrekkingFlights = park.NepalCategory === 'TrekkingFlights'
+    
+    if (isNepalTrekkingFlights) {
+      // Use custom Nepal Trekking/Flights icon with mountain emoji (⛰️) - blue color
+      return L.divIcon({
+        className: 'nepal-trekking-flights-marker',
+        html: `<div style="
+          background-color: #2196F3;
+          width: 30px;
+          height: 30px;
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          border: 3px solid #1976D2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        ">
+          <div style="
+            transform: rotate(45deg);
+            color: white;
+            font-size: 18px;
+            line-height: 1;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+          ">⛰️</div>
+        </div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+      })
+    }
+    
     // Check if it's a Nepal or Sri Lanka temple
     const isNepalTemple = park.NepalCategory === 'Temples'
     const isSriLankaTemple = park.SriLankaCategory === 'Temples'
     
     if (isNepalTemple || isSriLankaTemple) {
-      // Use temple icon (🕉️ Om) with country color
-      const country = park.Country || 'Nepal'
-      let color = '#FFEB3B' // Yellow for Nepal
-      let borderColor = '#FBC02D' // Darker yellow border
-      
-      if (country === 'Sri Lanka') {
-        color = '#FFF59D' // Light yellow for Sri Lanka
-        borderColor = '#FDD835'
-      }
-      
+      // Use temple icon (🕉️ Om) with saffron color
       return L.divIcon({
         className: 'temple-marker',
         html: `<div style="
-          background-color: ${color};
+          background-color: #FF9933;
           width: 30px;
           height: 30px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid ${borderColor};
+          border: 3px solid #FF8C00;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -957,16 +984,16 @@ function MapView() {
                      (park.Designation && park.Designation.includes('UNESCO'))
     
     if (isUnesco) {
-      // Use custom UNESCO icon with light violet color
+      // Use custom UNESCO icon with light blue color
       return L.divIcon({
         className: 'unesco-marker',
         html: `<div style="
-          background-color: #CE93D8;
+          background-color: #81D4FA;
           width: 30px;
           height: 30px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #BA68C8;
+          border: 3px solid #4FC3F7;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -995,18 +1022,10 @@ function MapView() {
     if (country === 'Canada') {
       color = '#F44336' // Red
       borderColor = '#C62828' // Darker red
-    } else if (country === 'India') {
-      color = '#CE93D8' // Light violet for India parks
-      borderColor = '#BA68C8' // Darker violet border
-    } else if (country === 'Nepal') {
-      color = '#FFEB3B' // Yellow
-      borderColor = '#FBC02D' // Darker yellow border
-    } else if (country === 'Sri Lanka') {
-      color = '#FFF59D' // Light yellow
-      borderColor = '#FDD835' // Yellow border
-    } else if (country === 'Costa Rica') {
-      color = '#9C27B0' // Violet
-      borderColor = '#7B1FA2' // Darker violet
+    } else {
+      // All other countries (India, Nepal, Sri Lanka, Costa Rica, etc.) - pale green
+      color = '#98FB98' // Pale green
+      borderColor = '#7CB342' // Darker pale green border
     }
     
     // Create custom tree icon with country color
@@ -1168,9 +1187,10 @@ function MapView() {
             const nepalParksVisible = visibleRegions['Nepal-Parks'] === true
             const nepalTemplesVisible = visibleRegions['Nepal-Temples'] === true
             const nepalUnescoVisible = visibleRegions['Nepal-UNESCO'] === true
+            const nepalTrekkingFlightsVisible = visibleRegions['Nepal-TrekkingFlights'] === true
             
             // If all Nepal regions are false or undefined, definitely skip
-            if (nepalParksVisible !== true && nepalTemplesVisible !== true && nepalUnescoVisible !== true) {
+            if (nepalParksVisible !== true && nepalTemplesVisible !== true && nepalUnescoVisible !== true && nepalTrekkingFlightsVisible !== true) {
               return null
             }
             
@@ -1182,8 +1202,12 @@ function MapView() {
             if (park.NepalCategory === 'UNESCO' && nepalUnescoVisible !== true) {
               return null
             }
-            // If it's not a temple or UNESCO but parks are not visible, skip
-            if (park.NepalCategory !== 'Temples' && park.NepalCategory !== 'UNESCO' && nepalParksVisible !== true) {
+            // If it's TrekkingFlights but TrekkingFlights is not visible, skip
+            if (park.NepalCategory === 'TrekkingFlights' && nepalTrekkingFlightsVisible !== true) {
+              return null
+            }
+            // If it's not a temple, UNESCO, or TrekkingFlights but parks are not visible, skip
+            if (park.NepalCategory !== 'Temples' && park.NepalCategory !== 'UNESCO' && park.NepalCategory !== 'TrekkingFlights' && nepalParksVisible !== true) {
               return null
             }
           }

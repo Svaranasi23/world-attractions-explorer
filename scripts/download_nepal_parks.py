@@ -6,28 +6,7 @@ def get_nepal_parks():
     """
     
     nepal_parks = [
-        {
-            'Park_Code': 'CHI',
-            'Name': 'Chitwan National Park',
-            'Designation': 'National Park',
-            'States': 'Chitwan',
-            'Latitude': '27.5000',
-            'Longitude': '84.3333',
-            'Description': 'Chitwan National Park - UNESCO World Heritage Site. Home to one-horned rhinoceroses and Bengal tigers.',
-            'URL': 'https://en.wikipedia.org/wiki/Chitwan_National_Park',
-            'Country': 'Nepal'
-        },
-        {
-            'Park_Code': 'SAG',
-            'Name': 'Sagarmatha National Park',
-            'Designation': 'National Park',
-            'States': 'Solukhumbu',
-            'Latitude': '27.9881',
-            'Longitude': '86.9250',
-            'Description': 'Sagarmatha National Park - UNESCO World Heritage Site. Home to Mount Everest.',
-            'URL': 'https://en.wikipedia.org/wiki/Sagarmatha_National_Park',
-            'Country': 'Nepal'
-        },
+        # Note: Chitwan (CHI) and Sagarmatha (SAG) are in UNESCO CSV, removed from here
         {
             'Park_Code': 'BAR',
             'Name': 'Bardiya National Park',
