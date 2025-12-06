@@ -100,7 +100,9 @@ const getRegionCountries = (regionKey) => {
     'Costa Rica': ['Costa Rica'],
     'SouthEastAsia-UNESCO': ['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor'],
     'EastAsia-UNESCO': ['China', 'Japan', 'South Korea', 'North Korea', 'Mongolia'],
-    'SouthAsia-UNESCO': ['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives']
+    'SouthAsia-UNESCO': ['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives'],
+    'CentralAsia-UNESCO': ['Kazakhstan', 'Kyrgyzstan', 'Tajikistan', 'Turkmenistan', 'Uzbekistan'],
+    'WestAsia-UNESCO': ['Iran', 'Iraq', 'Jordan', 'Lebanon', 'Saudi Arabia', 'Syria', 'Turkey', 'UAE', 'Yemen', 'Oman', 'Qatar', 'Kuwait', 'Bahrain', 'Israel', 'Palestine']
   }
   return regionCountries[regionKey] || []
 }
@@ -516,6 +518,32 @@ function FilterPanel({ regions, visibleRegions, toggleRegion, toggleAllUSRegions
                 />
                 <strong style={{ color: '#9c27b0', fontSize: '14px' }}>🏛️ East Asia UNESCO</strong> ({regions['EastAsia-UNESCO'].length} sites)
                 <InfoTooltip countries={getRegionCountries('EastAsia-UNESCO')} />
+              </label>
+            )}
+            
+            {/* Central Asia UNESCO Sites */}
+            {regions['CentralAsia-UNESCO'] && regions['CentralAsia-UNESCO'].length > 0 && (
+              <label key="CentralAsia-UNESCO" className="filter-item central-asia-item">
+                <input
+                  type="checkbox"
+                  checked={visibleRegions['CentralAsia-UNESCO'] !== false}
+                  onChange={(e) => handleRegionToggle('CentralAsia-UNESCO', e.target.checked)}
+                />
+                <strong style={{ color: '#795548', fontSize: '14px' }}>🏔️ Central Asia UNESCO</strong> ({regions['CentralAsia-UNESCO'].length} sites)
+                <InfoTooltip countries={getRegionCountries('CentralAsia-UNESCO')} />
+              </label>
+            )}
+            
+            {/* West Asia UNESCO Sites */}
+            {regions['WestAsia-UNESCO'] && regions['WestAsia-UNESCO'].length > 0 && (
+              <label key="WestAsia-UNESCO" className="filter-item west-asia-item">
+                <input
+                  type="checkbox"
+                  checked={visibleRegions['WestAsia-UNESCO'] !== false}
+                  onChange={(e) => handleRegionToggle('WestAsia-UNESCO', e.target.checked)}
+                />
+                <strong style={{ color: '#e91e63', fontSize: '14px' }}>🕌 West Asia UNESCO</strong> ({regions['WestAsia-UNESCO'].length} sites)
+                <InfoTooltip countries={getRegionCountries('WestAsia-UNESCO')} />
               </label>
             )}
             

@@ -1,5 +1,109 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import './StatisticsPanel.css'
+import './FilterPanel.css'
+
+// Helper function to get countries for each region (same as FilterPanel)
+const getRegionCountries = (regionKey) => {
+  const regionCountries = {
+    'United States': ['United States'],
+    'Canada': ['Canada'],
+    'India-Parks': ['India'],
+    'India-UNESCO': ['India'],
+    'India-Jyotirlinga': ['India'],
+    'India-ShaktiPeetha': ['India', 'Sri Lanka'],
+    'India-OtherTemples': ['India'],
+    'India-Mutts': ['India'],
+    'India-DivyaDesam': ['India'],
+    'India-Forts': ['India'],
+    'Nepal-Parks': ['Nepal'],
+    'Nepal-Temples': ['Nepal'],
+    'Nepal-UNESCO': ['Nepal'],
+    'Nepal-TrekkingFlights': ['Nepal'],
+    'Sri Lanka-Parks': ['Sri Lanka'],
+    'Sri Lanka-Temples': ['Sri Lanka'],
+    'Sri Lanka-UNESCO': ['Sri Lanka'],
+    'Costa Rica': ['Costa Rica'],
+    'SouthEastAsia-UNESCO': ['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor'],
+    'EastAsia-UNESCO': ['China', 'Japan', 'South Korea', 'North Korea', 'Mongolia'],
+    'SouthAsia-UNESCO': ['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives'],
+    'CentralAsia-UNESCO': ['Kazakhstan', 'Kyrgyzstan', 'Tajikistan', 'Turkmenistan', 'Uzbekistan'],
+    'WestAsia-UNESCO': ['Iran', 'Iraq', 'Jordan', 'Lebanon', 'Saudi Arabia', 'Syria', 'Turkey', 'UAE', 'Yemen', 'Oman', 'Qatar', 'Kuwait', 'Bahrain', 'Israel', 'Palestine']
+  }
+  return regionCountries[regionKey] || []
+}
+
+// Info Tooltip Component (same as FilterPanel)
+function InfoTooltip({ countries }) {
+  const [showTooltip, setShowTooltip] = useState(false)
+  const [position, setPosition] = useState({ top: 0, left: 0 })
+  const wrapperRef = useRef(null)
+
+  if (!countries || countries.length === 0) return null
+
+  const updatePosition = () => {
+    if (wrapperRef.current) {
+      const rect = wrapperRef.current.getBoundingClientRect()
+      setPosition({
+        top: rect.top - 5,
+        left: rect.left + rect.width / 2
+      })
+    }
+  }
+
+  const handleMouseEnter = () => {
+    updatePosition()
+    setShowTooltip(true)
+  }
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false)
+  }
+
+  useEffect(() => {
+    if (showTooltip) {
+      updatePosition()
+      const handleScroll = () => updatePosition()
+      window.addEventListener('scroll', handleScroll, true)
+      return () => window.removeEventListener('scroll', handleScroll, true)
+    }
+  }, [showTooltip])
+
+  return (
+    <>
+      <span 
+        ref={wrapperRef}
+        className="info-icon-wrapper"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <span className="info-icon">ℹ️</span>
+      </span>
+      {showTooltip && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="info-tooltip"
+          style={{
+            top: `${position.top}px`,
+            left: `${position.left}px`,
+            transform: 'translate(-50%, -100%)'
+          }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="tooltip-content">
+            <strong>Countries in this region:</strong>
+            <ul>
+              {countries.map((country, index) => (
+                <li key={index}>{country}</li>
+              ))}
+            </ul>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
+  )
+}
 
 function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
   const [expandedCountries, setExpandedCountries] = useState({})
@@ -21,6 +125,8 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
     const southeastAsiaCountryCounts = {}
     const eastAsiaCountryCounts = {}
     const southAsiaCountryCounts = {}
+    const centralAsiaCountryCounts = {}
+    const westAsiaCountryCounts = {}
     const countryCounts = { 'United States': 0, 'Canada': 0, 'India': 0, 'Nepal': 0, 'Sri Lanka': 0, 'Costa Rica': 0 }
 
     parks.forEach(park => {
@@ -62,6 +168,12 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
       } else if (['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives'].includes(country)) {
         countryCounts[country] = (countryCounts[country] || 0) + 1
         southAsiaCountryCounts[country] = (southAsiaCountryCounts[country] || 0) + 1
+      } else if (['Kazakhstan', 'Kyrgyzstan', 'Tajikistan', 'Turkmenistan', 'Uzbekistan'].includes(country)) {
+        countryCounts[country] = (countryCounts[country] || 0) + 1
+        centralAsiaCountryCounts[country] = (centralAsiaCountryCounts[country] || 0) + 1
+      } else if (['Iran', 'Iraq', 'Jordan', 'Lebanon', 'Saudi Arabia', 'Syria', 'Turkey', 'UAE', 'United Arab Emirates', 'Yemen', 'Oman', 'Qatar', 'Kuwait', 'Bahrain', 'Israel', 'Palestine'].includes(country)) {
+        countryCounts[country] = (countryCounts[country] || 0) + 1
+        westAsiaCountryCounts[country] = (westAsiaCountryCounts[country] || 0) + 1
       }
     })
 
@@ -101,7 +213,15 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
 
-    return { topStates, topProvinces, topIndiaStates, topNepalStates, topSriLankaStates, topCostaRicaStates, topSoutheastAsiaCountries, topEastAsiaCountries, topSouthAsiaCountries, countryCounts }
+    const topCentralAsiaCountries = Object.entries(centralAsiaCountryCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+
+    const topWestAsiaCountries = Object.entries(westAsiaCountryCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+
+    return { topStates, topProvinces, topIndiaStates, topNepalStates, topSriLankaStates, topCostaRicaStates, topSoutheastAsiaCountries, topEastAsiaCountries, topSouthAsiaCountries, topCentralAsiaCountries, topWestAsiaCountries, countryCounts }
   }, [parks])
 
   const totalIndiaAttractions = (regions['India-Parks']?.length || 0) + 
@@ -162,6 +282,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           >
             <span className="country-name">🇨🇦 Canada</span>
             <span className="country-count">{stats.countryCounts['Canada'] || 0}</span>
+            <InfoTooltip countries={getRegionCountries('Canada')} />
             <span className="collapse-icon">{expandedCountries['Canada'] ? '▼' : '▶'}</span>
           </div>
           {expandedCountries['Canada'] && (
@@ -190,6 +311,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           >
             <span className="country-name">🇮🇳 India</span>
             <span className="country-count">{stats.countryCounts['India'] || 0}</span>
+            <InfoTooltip countries={getRegionCountries('India-Parks')} />
             <span className="collapse-icon">{expandedCountries['India'] ? '▼' : '▶'}</span>
           </div>
           {expandedCountries['India'] && (
@@ -229,6 +351,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           >
             <span className="country-name">🇨🇷 Costa Rica</span>
             <span className="country-count">{stats.countryCounts['Costa Rica'] || 0}</span>
+            <InfoTooltip countries={getRegionCountries('Costa Rica')} />
             <span className="collapse-icon">{expandedCountries['Costa Rica'] ? '▼' : '▶'}</span>
           </div>
           {expandedCountries['Costa Rica'] && (
@@ -257,6 +380,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           >
             <span className="country-name">🌏 South East Asia</span>
             <span className="country-count">{regions['SouthEastAsia-UNESCO']?.length || 0}</span>
+            <InfoTooltip countries={getRegionCountries('SouthEastAsia-UNESCO')} />
             <span className="collapse-icon">{expandedCountries['South East Asia'] ? '▼' : '▶'}</span>
           </div>
           {expandedCountries['South East Asia'] && (
@@ -285,6 +409,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           >
             <span className="country-name">🏛️ East Asia</span>
             <span className="country-count">{regions['EastAsia-UNESCO']?.length || 0}</span>
+            <InfoTooltip countries={getRegionCountries('EastAsia-UNESCO')} />
             <span className="collapse-icon">{expandedCountries['East Asia'] ? '▼' : '▶'}</span>
           </div>
           {expandedCountries['East Asia'] && (
@@ -309,10 +434,69 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
         <div className="country-item">
           <div 
             className="country-header"
+            onClick={() => toggleCountry('Central Asia')}
+          >
+            <span className="country-name">🏔️ Central Asia</span>
+            <span className="country-count">{regions['CentralAsia-UNESCO']?.length || 0}</span>
+            <InfoTooltip countries={getRegionCountries('CentralAsia-UNESCO')} />
+            <span className="collapse-icon">{expandedCountries['Central Asia'] ? '▼' : '▶'}</span>
+          </div>
+          {expandedCountries['Central Asia'] && (
+            <div className="country-details">
+              <p>Total UNESCO Sites: {regions['CentralAsia-UNESCO']?.length || 0}</p>
+              {stats.topCentralAsiaCountries && stats.topCentralAsiaCountries.length > 0 && (
+                <div>
+                  <p><strong>Countries:</strong></p>
+                  <ol>
+                    {stats.topCentralAsiaCountries.map(([country, count]) => (
+                      <li key={country}>
+                        {country}: {count} site{count > 1 ? 's' : ''}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="country-item">
+          <div 
+            className="country-header"
+            onClick={() => toggleCountry('West Asia')}
+          >
+            <span className="country-name">🕌 West Asia</span>
+            <span className="country-count">{regions['WestAsia-UNESCO']?.length || 0}</span>
+            <InfoTooltip countries={getRegionCountries('WestAsia-UNESCO')} />
+            <span className="collapse-icon">{expandedCountries['West Asia'] ? '▼' : '▶'}</span>
+          </div>
+          {expandedCountries['West Asia'] && (
+            <div className="country-details">
+              <p>Total UNESCO Sites: {regions['WestAsia-UNESCO']?.length || 0}</p>
+              {stats.topWestAsiaCountries && stats.topWestAsiaCountries.length > 0 && (
+                <div>
+                  <p><strong>Countries:</strong></p>
+                  <ol>
+                    {stats.topWestAsiaCountries.map(([country, count]) => (
+                      <li key={country}>
+                        {country}: {count} site{count > 1 ? 's' : ''}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="country-item">
+          <div 
+            className="country-header"
             onClick={() => toggleCountry('South Asia')}
           >
             <span className="country-name">🏛️ South Asia</span>
             <span className="country-count">{(regions['Nepal-Parks']?.length || 0) + (regions['Nepal-Temples']?.length || 0) + (regions['Nepal-UNESCO']?.length || 0) + (regions['Nepal-TrekkingFlights']?.length || 0) + (regions['Sri Lanka-Parks']?.length || 0) + (regions['Sri Lanka-Temples']?.length || 0) + (regions['Sri Lanka-UNESCO']?.length || 0) + (regions['SouthAsia-UNESCO']?.length || 0)}</span>
+            <InfoTooltip countries={['Nepal', 'Sri Lanka', 'Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives']} />
             <span className="collapse-icon">{expandedCountries['South Asia'] ? '▼' : '▶'}</span>
           </div>
           {expandedCountries['South Asia'] && (

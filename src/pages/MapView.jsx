@@ -747,12 +747,50 @@ function MapView() {
   }
 
   const getParkIcon = (park) => {
-    // Check if it's a UNESCO site FIRST - UNESCO sites should always get UNESCO icon regardless of other categories
+    // Check if it's explicitly categorized as a temple FIRST - temples should get temple icon even if they mention UNESCO
+    const isNepalTemple = park.NepalCategory === 'Temples'
+    const isSriLankaTemple = park.SriLankaCategory === 'Temples'
+    const isIndiaTemple = park.IndiaCategory === 'OtherTemples' || park.IndiaCategory === 'Jyotirlinga'
+    
+    // If it's explicitly a temple, check for temple icons first (before UNESCO check)
+    if (isNepalTemple || isSriLankaTemple) {
+      // Use temple icon (🕉️ Om) with saffron color
+      return L.divIcon({
+        className: 'temple-marker',
+        html: `<div style="
+          background-color: #FF9933;
+          width: 30px;
+          height: 30px;
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          border: 3px solid #FF8C00;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        ">
+          <div style="
+            transform: rotate(45deg);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+          ">🕉️</div>
+        </div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+      })
+    }
+    
+    // Check if it's a UNESCO site - UNESCO sites should get UNESCO icon
+    // But only if NOT explicitly categorized as a temple
     const isUnesco = park.IndiaCategory === 'UNESCO' || 
                      park.NepalCategory === 'UNESCO' ||
                      park.SriLankaCategory === 'UNESCO' ||
-                     (park.Designation && park.Designation.toUpperCase().includes('UNESCO')) ||
-                     (park.Description && park.Description.toUpperCase().includes('UNESCO WORLD HERITAGE'))
+                     (park.Designation && park.Designation.toUpperCase().includes('UNESCO') && !isNepalTemple && !isSriLankaTemple && !isIndiaTemple) ||
+                     (park.Description && park.Description.toUpperCase().includes('UNESCO WORLD HERITAGE') && !isNepalTemple && !isSriLankaTemple && !isIndiaTemple)
     
     if (isUnesco) {
       // Use custom UNESCO icon with light blue color for all UNESCO sites
@@ -1029,42 +1067,6 @@ function MapView() {
         popupAnchor: [0, -30]
       })
     }
-    
-    // Check if it's a Nepal or Sri Lanka temple
-    const isNepalTemple = park.NepalCategory === 'Temples'
-    const isSriLankaTemple = park.SriLankaCategory === 'Temples'
-    
-    if (isNepalTemple || isSriLankaTemple) {
-      // Use temple icon (🕉️ Om) with saffron color
-      return L.divIcon({
-        className: 'temple-marker',
-        html: `<div style="
-          background-color: #FF9933;
-          width: 30px;
-          height: 30px;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          border: 3px solid #FF8C00;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        ">
-          <div style="
-            transform: rotate(45deg);
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            line-height: 1;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-          ">🕉️</div>
-        </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
-      })
-    }
-    
     
     // Regular park icons by country - use tree icon with country colors
     const country = park.Country || 'United States'
