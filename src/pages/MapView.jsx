@@ -754,16 +754,38 @@ function MapView() {
     
     // If it's explicitly a temple, check for temple icons first (before UNESCO check)
     if (isNepalTemple || isSriLankaTemple) {
-      // Use temple icon (🕉️ Om) with saffron color
+      // Check if this temple is also a UNESCO site
+      const descriptionUpper = park.Description ? park.Description.toUpperCase() : ''
+      const designationUpper = park.Designation ? park.Designation.toUpperCase() : ''
+      const isTempleUnesco = park.NepalCategory === 'UNESCO' ||
+                             park.SriLankaCategory === 'UNESCO' ||
+                             designationUpper.includes('UNESCO') ||
+                             descriptionUpper.includes('UNESCO')
+      
+      // Debug logging for Pashupatinath
+      if (park.Name && park.Name.includes('Pashupatinath')) {
+        console.log('🏛️ Pashupatinath icon check:', {
+          name: park.Name,
+          nepalCategory: park.NepalCategory,
+          description: park.Description,
+          isTempleUnesco: isTempleUnesco,
+          bgColor: isTempleUnesco ? '#81D4FA' : '#FF9933'
+        })
+      }
+      
+      // Use temple icon (🕉️ Om) - blue background if UNESCO, saffron if not
+      const bgColor = isTempleUnesco ? '#81D4FA' : '#FF9933'
+      const borderColor = isTempleUnesco ? '#4FC3F7' : '#FF8C00'
+      
       return L.divIcon({
         className: 'temple-marker',
         html: `<div style="
-          background-color: #FF9933;
+          background-color: ${bgColor};
           width: 30px;
           height: 30px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #FF8C00;
+          border: 3px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
