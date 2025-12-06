@@ -47,6 +47,31 @@
   padding: 5px;
 }
 
+@media (max-width: 768px) {
+  .filter-list {
+    max-height: calc(70vh - 200px);
+    padding: 8px;
+  }
+
+  .filter-panel {
+    font-size: 13px;
+  }
+
+  .filter-header h3 {
+    font-size: 18px;
+  }
+
+  .filter-item {
+    padding: 6px 0;
+    font-size: 13px;
+  }
+
+  .filter-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 .filter-item {
   display: block;
   margin: 5px 0;

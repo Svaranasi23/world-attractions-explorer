@@ -101,3 +101,42 @@
   font-size: 12px;
 }
 
+@media (max-width: 768px) {
+  .statistics-panel {
+    font-size: 13px;
+  }
+
+  .statistics-panel h3 {
+    font-size: 18px;
+  }
+
+  .country-header {
+    padding: 10px 12px;
+  }
+
+  .country-name {
+    font-size: 14px;
+  }
+
+  .country-count {
+    font-size: 14px;
+  }
+
+  .country-details {
+    padding: 12px 15px;
+  }
+
+  .country-details p {
+    font-size: 13px;
+  }
+
+  .statistics-panel .tip-box {
+    margin: 15px 0 0 0;
+    padding: 10px;
+  }
+
+  .statistics-panel .tip-box p {
+    font-size: 12px;
+  }
+}
+
