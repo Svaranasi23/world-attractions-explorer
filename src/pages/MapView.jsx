@@ -192,7 +192,9 @@ function MapView() {
     'Nepal-TrekkingFlights': true,
     'Sri Lanka-Parks': true,
     'Sri Lanka-Temples': true,
-    'Costa Rica': true
+    'Sri Lanka-UNESCO': true,
+    'Costa Rica': true,
+    'Asia-UNESCO': true
   })
   const [showHeatMap, setShowHeatMap] = useState(false)
   const [showAirports, setShowAirports] = useState(false)
@@ -341,13 +343,18 @@ function MapView() {
         }
       } else if (country === 'Sri Lanka') {
         // Use SriLankaCategory to determine sub-region
-        if (park.SriLankaCategory === 'Temples') {
+        if (park.SriLankaCategory === 'UNESCO') {
+          region = 'Sri Lanka-UNESCO'
+        } else if (park.SriLankaCategory === 'Temples') {
           region = 'Sri Lanka-Temples'
         } else {
           region = 'Sri Lanka-Parks'
         }
       } else if (country === 'Costa Rica') {
         region = 'Costa Rica'
+      } else if (['China', 'Japan', 'Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Bangladesh', 'Pakistan'].includes(country)) {
+        // All new Asian UNESCO sites go to Asia-UNESCO region
+        region = 'Asia-UNESCO'
       } else if (country === 'United States') {
         if (states.includes('AK')) {
           region = 'Alaska'
@@ -414,6 +421,22 @@ function MapView() {
           return false
         }
         if (isNepalTrekkingFlights && visibleRegions['Nepal-TrekkingFlights'] !== true) {
+          return false
+        }
+      }
+      // Final safety filter: explicitly remove any Sri Lanka parks if their regions are not visible
+      if (park.Country === 'Sri Lanka') {
+        const isSriLankaPark = !park.SriLankaCategory || (park.SriLankaCategory !== 'Temples' && park.SriLankaCategory !== 'UNESCO')
+        const isSriLankaTemple = park.SriLankaCategory === 'Temples'
+        const isSriLankaUnesco = park.SriLankaCategory === 'UNESCO'
+        
+        if (isSriLankaPark && visibleRegions['Sri Lanka-Parks'] !== true) {
+          return false
+        }
+        if (isSriLankaTemple && visibleRegions['Sri Lanka-Temples'] !== true) {
+          return false
+        }
+        if (isSriLankaUnesco && visibleRegions['Sri Lanka-UNESCO'] !== true) {
           return false
         }
       }
@@ -555,7 +578,9 @@ function MapView() {
         'Sri Lanka': { center: [7.8731, 80.7718], zoom: 7 },
         'Sri Lanka-Parks': { center: [7.8731, 80.7718], zoom: 7 },
         'Sri Lanka-Temples': { center: [7.2944, 80.6414], zoom: 8 },
-        'Costa Rica': { center: [9.7489, -83.7534], zoom: 7 }
+        'Sri Lanka-UNESCO': { center: [7.8731, 80.7718], zoom: 7 },
+        'Costa Rica': { center: [9.7489, -83.7534], zoom: 7 },
+        'Asia-UNESCO': { center: [25.0, 100.0], zoom: 4 }
       }
       return countryCenters[regionName] || null
     }
@@ -648,7 +673,7 @@ function MapView() {
   }
 
   const toggleAllSriLankaRegions = (show, shouldFocus = false) => {
-    const sriLankaRegions = ['Sri Lanka-Parks', 'Sri Lanka-Temples']
+    const sriLankaRegions = ['Sri Lanka-Parks', 'Sri Lanka-Temples', 'Sri Lanka-UNESCO']
     setVisibleRegions(prev => {
       const updated = { ...prev }
       sriLankaRegions.forEach(region => {
@@ -662,11 +687,49 @@ function MapView() {
   }
 
   const areAllSriLankaRegionsVisible = () => {
-    const sriLankaRegions = ['Sri Lanka-Parks', 'Sri Lanka-Temples']
+    const sriLankaRegions = ['Sri Lanka-Parks', 'Sri Lanka-Temples', 'Sri Lanka-UNESCO']
     return sriLankaRegions.every(region => visibleRegions[region] !== false)
   }
 
   const getParkIcon = (park) => {
+    // Check if it's a UNESCO site FIRST - UNESCO sites should always get UNESCO icon regardless of other categories
+    const isUnesco = park.IndiaCategory === 'UNESCO' || 
+                     park.NepalCategory === 'UNESCO' ||
+                     park.SriLankaCategory === 'UNESCO' ||
+                     (park.Designation && park.Designation.toUpperCase().includes('UNESCO')) ||
+                     (park.Description && park.Description.toUpperCase().includes('UNESCO WORLD HERITAGE'))
+    
+    if (isUnesco) {
+      // Use custom UNESCO icon with light blue color for all UNESCO sites
+      return L.divIcon({
+        className: 'unesco-marker',
+        html: `<div style="
+          background-color: #81D4FA;
+          width: 30px;
+          height: 30px;
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          border: 3px solid #4FC3F7;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        ">
+          <div style="
+            transform: rotate(45deg);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+          ">🏛️</div>
+        </div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+      })
+    }
+    
     // Check if it's a Jyotirlinga temple
     const isJyotirlinga = park.IndiaCategory === 'Jyotirlinga' || 
                           (park.Designation && park.Designation.includes('Jyotirlinga'))
@@ -878,38 +941,6 @@ function MapView() {
       })
     }
     
-    // Check if it's a Nepal UNESCO site
-    const isNepalUnesco = park.NepalCategory === 'UNESCO'
-    
-    if (isNepalUnesco) {
-      // Use custom Nepal UNESCO icon with monument emoji (🏛️) - light blue color
-      return L.divIcon({
-        className: 'nepal-unesco-marker',
-        html: `<div style="
-          background-color: #81D4FA;
-          width: 30px;
-          height: 30px;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          border: 3px solid #4FC3F7;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        ">
-          <div style="
-            transform: rotate(45deg);
-            color: white;
-            font-size: 18px;
-            line-height: 1;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-          ">🏛️</div>
-        </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
-      })
-    }
     
     // Check if it's a Nepal Trekking Route or Mountain Flight
     const isNepalTrekkingFlights = park.NepalCategory === 'TrekkingFlights'
@@ -979,40 +1010,6 @@ function MapView() {
       })
     }
     
-    // Check if it's a UNESCO site
-    const isUnesco = park.IndiaCategory === 'UNESCO' || 
-                     (park.Designation && park.Designation.includes('UNESCO'))
-    
-    if (isUnesco) {
-      // Use custom UNESCO icon with light blue color
-      return L.divIcon({
-        className: 'unesco-marker',
-        html: `<div style="
-          background-color: #81D4FA;
-          width: 30px;
-          height: 30px;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          border: 3px solid #4FC3F7;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        ">
-          <div style="
-            transform: rotate(45deg);
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            line-height: 1;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-          ">🏛️</div>
-        </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
-      })
-    }
     
     // Regular park icons by country - use tree icon with country colors
     const country = park.Country || 'United States'
@@ -1059,11 +1056,11 @@ function MapView() {
   }
 
   const getAirportIcon = (airport) => {
-    // Use light blue for all airports
-    const color = '#87CEEB' // Light blue (sky blue)
-    const borderColor = '#4682B4' // Steel blue border
+    // Use white for all airports
+    const color = '#FFFFFF' // White
+    const borderColor = '#666666' // Dark gray border
     
-    // Create custom airplane icon with light blue color
+    // Create custom airplane icon with white background
     return L.divIcon({
       className: 'airport-marker',
       html: `<div style="
@@ -1079,7 +1076,7 @@ function MapView() {
         transform: rotate(0deg);
       ">
         <div style="
-          color: white;
+          color: #333333;
           font-size: 18px;
           line-height: 1;
           transform: rotate(0deg);
@@ -1190,6 +1187,31 @@ function MapView() {
             }
             // If it's not a temple, UNESCO, or TrekkingFlights but parks are not visible, skip
             if (park.NepalCategory !== 'Temples' && park.NepalCategory !== 'UNESCO' && park.NepalCategory !== 'TrekkingFlights' && nepalParksVisible !== true) {
+              return null
+            }
+          }
+          
+          // Additional safety: if park is from Sri Lanka but Sri Lanka regions are not visible, skip it
+          if (country === 'Sri Lanka') {
+            const sriLankaParksVisible = visibleRegions['Sri Lanka-Parks'] === true
+            const sriLankaTemplesVisible = visibleRegions['Sri Lanka-Temples'] === true
+            const sriLankaUnescoVisible = visibleRegions['Sri Lanka-UNESCO'] === true
+            
+            // If all Sri Lanka regions are false or undefined, definitely skip
+            if (sriLankaParksVisible !== true && sriLankaTemplesVisible !== true && sriLankaUnescoVisible !== true) {
+              return null
+            }
+            
+            // Double-check: if it's a temple but temples are not visible, skip
+            if (park.SriLankaCategory === 'Temples' && sriLankaTemplesVisible !== true) {
+              return null
+            }
+            // If it's UNESCO but UNESCO is not visible, skip
+            if (park.SriLankaCategory === 'UNESCO' && sriLankaUnescoVisible !== true) {
+              return null
+            }
+            // If it's not a temple or UNESCO but parks are not visible, skip
+            if (park.SriLankaCategory !== 'Temples' && park.SriLankaCategory !== 'UNESCO' && sriLankaParksVisible !== true) {
               return null
             }
           }
