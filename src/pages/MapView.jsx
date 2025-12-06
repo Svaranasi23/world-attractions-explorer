@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, FeatureGroup, LayerGroup, useMap, GeoJSON } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, FeatureGroup, LayerGroup, useMap, GeoJSON, ZoomControl } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet.heat'
@@ -1105,8 +1105,10 @@ function MapView() {
         style={{ height: '100vh', width: '100%' }}
         minZoom={2}
         maxZoom={18}
+        zoomControl={false}
         ref={mapRef}
       >
+        <ZoomControl position="bottomright" />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"

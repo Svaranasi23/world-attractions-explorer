@@ -103,6 +103,95 @@ This file documents all prompts and interactions during the development and depl
 
 ---
 
+### Prompt 6: "letus make tsats and filters as hamurger menu"
+**Date:** Initial session
+**Context:** User requested to convert the stats and filters panels into a hamburger menu design
+
+**Actions Taken:**
+1. Redesigned TabPanel component to use hamburger menu pattern:
+   - Added hamburger button (☰) in top-left corner
+   - Created slide-in drawer from left side (mobile) or right side (desktop)
+   - Added animated hamburger icon that transforms to X when open
+   - Added overlay/backdrop when menu is open
+   - Implemented click-outside-to-close functionality
+   - Added smooth slide animations
+2. Updated TabPanel.css:
+   - Removed old bottom drawer styles
+   - Added hamburger button styles with hover effects
+   - Created slide-in drawer with proper z-indexing
+   - Added overlay with fade-in animation
+   - Made drawer slide from left on mobile, right on desktop
+   - Added menu header with close button
+   - Prevented body scroll when menu is open on mobile
+
+**Files Modified:**
+- `src/components/TabPanel.jsx` - Complete redesign to hamburger menu pattern
+- `src/components/TabPanel.css` - New hamburger menu styles and animations
+
+**Outcome:** App now uses a modern hamburger menu:
+- Hamburger button (☰) in top-left corner
+- Slide-in drawer with Filters and Statistics tabs
+- Overlay backdrop when menu is open
+- Click outside or close button to dismiss
+- Smooth animations and transitions
+- Works on both mobile and desktop
+- Hamburger icon animates to X when open
+
+---
+
+### Prompt 7: "Make filters and stats as 2 menu items in the hamburger menu"
+**Date:** Initial session
+**Context:** User requested to change the hamburger menu so Filters and Statistics appear as separate menu items instead of tabs
+
+**Actions Taken:**
+1. Redesigned TabPanel component:
+   - Added menu items list view (shows when menu first opens)
+   - Created two menu items: "🔍 Filters" and "📊 Statistics"
+   - When a menu item is clicked, it shows that panel's content
+   - Added back button (←) in header when viewing content
+   - Removed tab headers, replaced with menu items navigation
+2. Updated TabPanel.css:
+   - Added styles for menu items list
+   - Styled menu items with icons, text, and arrow indicators
+   - Added hover effects for menu items
+   - Updated header to show back button on left, title in center, close on right
+   - Removed old tab-header styles
+
+**Files Modified:**
+- `src/components/TabPanel.jsx` - Changed to menu items navigation pattern
+- `src/components/TabPanel.css` - Added menu items styles
+
+**Outcome:** Hamburger menu now shows:
+- Menu items list when first opened (Filters and Statistics as separate items)
+- Clicking a menu item opens that panel's content
+- Back button (←) to return to menu items list
+- Clean, intuitive navigation pattern
+- Better mobile UX with clear menu structure
+
+---
+
+### Prompt 8: "hamburger is on top of zoom icons. Move zoom icon"
+**Date:** Initial session
+**Context:** User reported that the hamburger menu button was overlapping with Leaflet's zoom controls
+
+**Actions Taken:**
+1. Added CSS to reposition Leaflet zoom controls:
+   - Moved zoom controls from top-right to bottom-right
+   - Positioned at bottom: 20px, right: 20px
+   - Added mobile-specific positioning (bottom: 15px, right: 15px)
+   - Used !important to override Leaflet's default positioning
+
+**Files Modified:**
+- `src/pages/MapView.css` - Added styles to reposition zoom controls
+
+**Outcome:** Zoom controls are now positioned in bottom-right corner:
+- No longer overlaps with hamburger button (top-left)
+- Better spacing and visibility
+- Responsive positioning for mobile devices
+- Clean UI with proper element separation
+
+---
+
 ## Notes
 
 - All prompts are logged chronologically

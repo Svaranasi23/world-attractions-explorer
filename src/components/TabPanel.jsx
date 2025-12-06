@@ -4,159 +4,153 @@ import FilterPanel from './FilterPanel'
 import './TabPanel.css'
 
 function TabPanel({ activeTab, setActiveTab, parks, regions, visibleRegions, toggleRegion, toggleAllUSRegions, areAllUSRegionsVisible, toggleAllIndiaRegions, areAllIndiaRegionsVisible, toggleAllNepalRegions, areAllNepalRegionsVisible, toggleAllSriLankaRegions, areAllSriLankaRegionsVisible, showAirports, setShowAirports }) {
-  const [isMinimized, setIsMinimized] = useState(false)
-  const [isHidden, setIsHidden] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [currentView, setCurrentView] = useState(null) // null = menu list, 'filters' or 'stats' = content view
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768)
+  const toggleMenu = () => {
+    setIsOpen(!isOpen)
+    if (!isOpen) {
+      setCurrentView(null) // Reset to menu when opening
     }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
-  const handleMinimize = () => {
-    setIsMinimized(true)
-    setIsHidden(false)
   }
 
-  const handleClose = () => {
-    setIsHidden(true)
-    setIsMinimized(false)
+  const closeMenu = () => {
+    setIsOpen(false)
+    setCurrentView(null)
   }
 
-  const handleExpand = () => {
-    setIsMinimized(false)
-    setIsHidden(false)
+  const handleMenuClick = (view) => {
+    setCurrentView(view)
+    setActiveTab(view)
   }
 
-  // If minimized, show a small bar that can be clicked to expand
-  if (isMobile && isMinimized && !isHidden) {
-    return (
-      <div className="tabbed-panel minimized" onClick={handleExpand}>
-        <div className="tab-headers">
-          <button
-            className={`tab-button ${activeTab === 'filters' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.stopPropagation()
-              setActiveTab('filters')
-              handleExpand()
-            }}
-          >
-            🔍 Filters
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'stats' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.stopPropagation()
-              setActiveTab('stats')
-              handleExpand()
-            }}
-          >
-            📊 Statistics
-          </button>
-        </div>
-      </div>
-    )
+  const handleBack = () => {
+    setCurrentView(null)
   }
 
-  // If hidden, show nothing (or a small floating button to show panel)
-  if (isMobile && isHidden) {
-    return (
-      <button
-        className="mobile-show-panel-button"
-        onClick={handleExpand}
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          width: '56px',
-          height: '56px',
-          borderRadius: '50%',
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          border: 'none',
-          fontSize: '24px',
-          cursor: 'pointer',
-          zIndex: 999,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        ☰
-      </button>
-    )
-  }
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isOpen && !event.target.closest('.hamburger-menu') && !event.target.closest('.hamburger-button')) {
+        closeMenu()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      // Prevent body scroll when menu is open on mobile
+      document.body.style.overflow = 'hidden'
+      // Add class to body to adjust zoom controls position
+      document.body.classList.add('menu-open')
+    } else {
+      document.body.style.overflow = ''
+      document.body.classList.remove('menu-open')
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.body.style.overflow = ''
+      document.body.classList.remove('menu-open')
+    }
+  }, [isOpen])
 
   return (
-    <div className={`tabbed-panel ${isMinimized ? 'minimized' : ''} ${isHidden ? 'hidden' : ''}`}>
-      {isMobile && (
-        <>
+    <>
+      {/* Hamburger Menu Button */}
+      <button
+        className="hamburger-button"
+        onClick={toggleMenu}
+        aria-label="Toggle menu"
+        aria-expanded={isOpen}
+      >
+        <span className={`hamburger-icon ${isOpen ? 'open' : ''}`}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+
+      {/* Overlay */}
+      {isOpen && (
+        <div className="menu-overlay" onClick={closeMenu}></div>
+      )}
+
+      {/* Slide-in Drawer */}
+      <div className={`hamburger-menu ${isOpen ? 'open' : ''}`}>
+        <div className="menu-header">
+          {currentView && (
+            <button
+              className="menu-back-button"
+              onClick={handleBack}
+              aria-label="Back to menu"
+            >
+              ←
+            </button>
+          )}
+          <h2>{currentView ? (currentView === 'filters' ? '🔍 Filters' : '📊 Statistics') : 'Menu'}</h2>
           <button
-            className="mobile-minimize-button"
-            onClick={handleMinimize}
-            aria-label="Minimize panel"
-          >
-            −
-          </button>
-          <button
-            className="mobile-close-button"
-            onClick={handleClose}
-            aria-label="Close panel"
+            className="menu-close-button"
+            onClick={closeMenu}
+            aria-label="Close menu"
           >
             ×
           </button>
-        </>
-      )}
-      <div className="tab-headers">
-        <button
-          className={`tab-button ${activeTab === 'filters' ? 'active' : ''}`}
-          onClick={() => setActiveTab('filters')}
-        >
-          🔍 Filters
-        </button>
-        <button
-          className={`tab-button ${activeTab === 'stats' ? 'active' : ''}`}
-          onClick={() => setActiveTab('stats')}
-        >
-          📊 Statistics
-        </button>
-      </div>
+        </div>
 
-      <div className="tab-content">
-        {activeTab === 'stats' && (
-          <StatisticsPanel
-            parks={parks}
-            regions={regions}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
-        )}
-        {activeTab === 'filters' && (
-          <FilterPanel
-            regions={regions}
-            visibleRegions={visibleRegions}
-            toggleRegion={toggleRegion}
-            toggleAllUSRegions={toggleAllUSRegions}
-            areAllUSRegionsVisible={areAllUSRegionsVisible}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            showAirports={showAirports}
-            setShowAirports={setShowAirports}
-            toggleAllIndiaRegions={toggleAllIndiaRegions}
-            areAllIndiaRegionsVisible={areAllIndiaRegionsVisible}
-            toggleAllNepalRegions={toggleAllNepalRegions}
-            areAllNepalRegionsVisible={areAllNepalRegionsVisible}
-            toggleAllSriLankaRegions={toggleAllSriLankaRegions}
-            areAllSriLankaRegionsVisible={areAllSriLankaRegionsVisible}
-          />
+        {!currentView ? (
+          /* Menu Items List */
+          <div className="menu-items">
+            <button
+              className="menu-item"
+              onClick={() => handleMenuClick('filters')}
+            >
+              <span className="menu-item-icon">🔍</span>
+              <span className="menu-item-text">Filters</span>
+              <span className="menu-item-arrow">→</span>
+            </button>
+            <button
+              className="menu-item"
+              onClick={() => handleMenuClick('stats')}
+            >
+              <span className="menu-item-icon">📊</span>
+              <span className="menu-item-text">Statistics</span>
+              <span className="menu-item-arrow">→</span>
+            </button>
+          </div>
+        ) : (
+          /* Content View */
+          <div className="tab-content">
+            {currentView === 'stats' && (
+              <StatisticsPanel
+                parks={parks}
+                regions={regions}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+              />
+            )}
+            {currentView === 'filters' && (
+              <FilterPanel
+                regions={regions}
+                visibleRegions={visibleRegions}
+                toggleRegion={toggleRegion}
+                toggleAllUSRegions={toggleAllUSRegions}
+                areAllUSRegionsVisible={areAllUSRegionsVisible}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                showAirports={showAirports}
+                setShowAirports={setShowAirports}
+                toggleAllIndiaRegions={toggleAllIndiaRegions}
+                areAllIndiaRegionsVisible={areAllIndiaRegionsVisible}
+                toggleAllNepalRegions={toggleAllNepalRegions}
+                areAllNepalRegionsVisible={areAllNepalRegionsVisible}
+                toggleAllSriLankaRegions={toggleAllSriLankaRegions}
+                areAllSriLankaRegionsVisible={areAllSriLankaRegionsVisible}
+              />
+            )}
+          </div>
         )}
       </div>
-    </div>
+    </>
   )
 }
 

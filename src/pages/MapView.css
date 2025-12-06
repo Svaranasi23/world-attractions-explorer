@@ -115,3 +115,48 @@
   color: #2e7d32;
 }
 
+/* Move ALL Leaflet zoom controls to bottom-right to avoid hamburger menu */
+/* Hide any controls in top-left or top-right */
+.leaflet-top.leaflet-left {
+  display: none !important; /* Hide top-left controls */
+}
+
+/* Move top-right controls to bottom-right */
+.leaflet-top.leaflet-right {
+  top: auto !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+  z-index: 1002 !important; /* Above hamburger menu (1000) and overlay (999) */
+}
+
+/* Ensure zoom controls are visible and properly positioned */
+.leaflet-control-zoom {
+  margin: 0 !important;
+  z-index: 1002 !important;
+  position: relative !important;
+}
+
+/* Ensure all Leaflet controls are above the menu */
+.leaflet-control-container {
+  z-index: 1002 !important;
+}
+
+.leaflet-control {
+  z-index: 1002 !important;
+}
+
+/* On desktop, when menu is open (350px wide), move zoom controls left to avoid overlap */
+@media (min-width: 769px) {
+  body.menu-open .leaflet-top.leaflet-right {
+    right: 370px !important; /* 350px menu + 20px gap */
+  }
+}
+
+@media (max-width: 768px) {
+  .leaflet-top.leaflet-right {
+    bottom: 15px !important;
+    right: 15px !important;
+  }
+}
+
