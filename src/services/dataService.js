@@ -649,7 +649,10 @@ export const categorizeParksByRegion = (parks) => {
     'Sri Lanka-Parks': [],
     'Sri Lanka-Temples': [],
     'Sri Lanka-UNESCO': [],
-    'Costa Rica': []
+    'Costa Rica': [],
+    'SouthEastAsia-UNESCO': [],
+    'EastAsia-UNESCO': [],
+    'SouthAsia-UNESCO': []
   }
   
   parks.forEach(park => {
@@ -703,6 +706,21 @@ export const categorizeParksByRegion = (parks) => {
       }
     } else if (country === 'Costa Rica') {
       regions['Costa Rica'].push(park)
+    } else if (['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor'].includes(country)) {
+      // South East Asian countries
+      regions['SouthEastAsia-UNESCO'].push(park)
+    } else if (['China', 'Japan', 'South Korea', 'North Korea', 'Mongolia'].includes(country)) {
+      // East Asian countries
+      regions['EastAsia-UNESCO'].push(park)
+    } else if (['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives', 'Nepal', 'Sri Lanka'].includes(country)) {
+      // South Asian countries (Nepal and Sri Lanka are now included here, but also kept in their specific sub-regions)
+      // Note: Nepal and Sri Lanka parks are also added to their specific sub-regions above
+      if (country === 'Nepal' || country === 'Sri Lanka') {
+        // These are already handled above in their specific sub-regions, but we also add to SouthAsia for grouping
+        regions['SouthAsia-UNESCO'].push(park)
+      } else {
+        regions['SouthAsia-UNESCO'].push(park)
+      }
     } else {
       if (states.includes('AK')) {
         regions.Alaska.push(park)

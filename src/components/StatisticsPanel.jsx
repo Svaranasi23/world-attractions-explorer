@@ -18,6 +18,9 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
     const nepalStateCounts = {}
     const sriLankaStateCounts = {}
     const costaRicaStateCounts = {}
+    const southeastAsiaCountryCounts = {}
+    const eastAsiaCountryCounts = {}
+    const southAsiaCountryCounts = {}
     const countryCounts = { 'United States': 0, 'Canada': 0, 'India': 0, 'Nepal': 0, 'Sri Lanka': 0, 'Costa Rica': 0 }
 
     parks.forEach(park => {
@@ -50,6 +53,15 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
         states.forEach(state => {
           if (state) costaRicaStateCounts[state] = (costaRicaStateCounts[state] || 0) + 1
         })
+      } else if (['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor'].includes(country)) {
+        countryCounts[country] = (countryCounts[country] || 0) + 1
+        southeastAsiaCountryCounts[country] = (southeastAsiaCountryCounts[country] || 0) + 1
+      } else if (['China', 'Japan', 'South Korea', 'North Korea', 'Mongolia'].includes(country)) {
+        countryCounts[country] = (countryCounts[country] || 0) + 1
+        eastAsiaCountryCounts[country] = (eastAsiaCountryCounts[country] || 0) + 1
+      } else if (['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives'].includes(country)) {
+        countryCounts[country] = (countryCounts[country] || 0) + 1
+        southAsiaCountryCounts[country] = (southAsiaCountryCounts[country] || 0) + 1
       }
     })
 
@@ -77,7 +89,19 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
 
-    return { topStates, topProvinces, topIndiaStates, topNepalStates, topSriLankaStates, topCostaRicaStates, countryCounts }
+    const topSoutheastAsiaCountries = Object.entries(southeastAsiaCountryCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+
+    const topEastAsiaCountries = Object.entries(eastAsiaCountryCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+
+    const topSouthAsiaCountries = Object.entries(southAsiaCountryCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+
+    return { topStates, topProvinces, topIndiaStates, topNepalStates, topSriLankaStates, topCostaRicaStates, topSoutheastAsiaCountries, topEastAsiaCountries, topSouthAsiaCountries, countryCounts }
   }, [parks])
 
   const totalIndiaAttractions = (regions['India-Parks']?.length || 0) + 
@@ -106,7 +130,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           </div>
           {expandedCountries['United States'] && (
             <div className="country-details">
-              <p>Total Parks: {(regions.West?.length || 0) + (regions.South?.length || 0) + (regions.Midwest?.length || 0) + (regions.Northeast?.length || 0) + (regions.Alaska?.length || 0) + (regions.Hawaii?.length || 0)}</p>
+              <p>Total National Parks: {(regions.West?.length || 0) + (regions.South?.length || 0) + (regions.Midwest?.length || 0) + (regions.Northeast?.length || 0) + (regions.Alaska?.length || 0) + (regions.Hawaii?.length || 0)}</p>
               <ul>
                 <li>West: {regions.West?.length || 0}</li>
                 <li>South: {regions.South?.length || 0}</li>
@@ -142,7 +166,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           </div>
           {expandedCountries['Canada'] && (
             <div className="country-details">
-              <p>Total Parks: {regions.Canada?.length || 0}</p>
+              <p>Total National Parks: {regions.Canada?.length || 0}</p>
               {stats.topProvinces.length > 0 && (
                 <div>
                   <p><strong>Top 10 Provinces:</strong></p>
@@ -172,7 +196,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
             <div className="country-details">
               <p>Total Attractions: {totalIndiaAttractions}</p>
               <ul>
-                <li>🏞️ Parks: {regions['India-Parks']?.length || 0}</li>
+                <li>🏞️ National Parks: {regions['India-Parks']?.length || 0}</li>
                 <li>🏛️ UNESCO Sites: {regions['India-UNESCO']?.length || 0}</li>
                 <li>🔱 Jyotirlinga Temples: {regions['India-Jyotirlinga']?.length || 0}</li>
                 <li>🌸 Shakti Peethas: {regions['India-ShaktiPeetha']?.length || 0}</li>
@@ -197,72 +221,6 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           )}
         </div>
 
-        <div className="country-item">
-          <div 
-            className="country-header"
-            onClick={() => toggleCountry('Nepal')}
-          >
-            <span className="country-name">🇳🇵 Nepal</span>
-            <span className="country-count">{stats.countryCounts['Nepal'] || 0}</span>
-            <span className="collapse-icon">{expandedCountries['Nepal'] ? '▼' : '▶'}</span>
-          </div>
-          {expandedCountries['Nepal'] && (
-            <div className="country-details">
-              <p>Total Attractions: {(regions['Nepal-Parks']?.length || 0) + (regions['Nepal-Temples']?.length || 0) + (regions['Nepal-UNESCO']?.length || 0) + (regions['Nepal-TrekkingFlights']?.length || 0)}</p>
-              <ul>
-                <li>🏞️ Parks: {regions['Nepal-Parks']?.length || 0}</li>
-                <li>🛕 Temples: {regions['Nepal-Temples']?.length || 0}</li>
-                <li>🏛️ UNESCO Sites: {regions['Nepal-UNESCO']?.length || 0}</li>
-                <li>⛰️ Trekking: {regions['Nepal-TrekkingFlights']?.length || 0}</li>
-              </ul>
-              {stats.topNepalStates.length > 0 && (
-                <div>
-                  <p><strong>Top 10 Provinces/Districts:</strong></p>
-                  <ol>
-                    {stats.topNepalStates.map(([state, count]) => (
-                      <li key={state}>
-                        {state}: {count} attraction{count > 1 ? 's' : ''}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="country-item">
-          <div 
-            className="country-header"
-            onClick={() => toggleCountry('Sri Lanka')}
-          >
-            <span className="country-name">🇱🇰 Sri Lanka</span>
-            <span className="country-count">{stats.countryCounts['Sri Lanka'] || 0}</span>
-            <span className="collapse-icon">{expandedCountries['Sri Lanka'] ? '▼' : '▶'}</span>
-          </div>
-          {expandedCountries['Sri Lanka'] && (
-            <div className="country-details">
-              <p>Total Attractions: {(regions['Sri Lanka-Parks']?.length || 0) + (regions['Sri Lanka-Temples']?.length || 0) + (regions['Sri Lanka-UNESCO']?.length || 0)}</p>
-              <ul>
-                <li>🏞️ Parks: {regions['Sri Lanka-Parks']?.length || 0}</li>
-                <li>🛕 Temples: {regions['Sri Lanka-Temples']?.length || 0}</li>
-                <li>🏛️ UNESCO Sites: {regions['Sri Lanka-UNESCO']?.length || 0}</li>
-              </ul>
-              {stats.topSriLankaStates.length > 0 && (
-                <div>
-                  <p><strong>Top 10 Provinces:</strong></p>
-                  <ol>
-                    {stats.topSriLankaStates.map(([state, count]) => (
-                      <li key={state}>
-                        {state}: {count} attraction{count > 1 ? 's' : ''}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
 
         <div className="country-item">
           <div 
@@ -275,7 +233,7 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
           </div>
           {expandedCountries['Costa Rica'] && (
             <div className="country-details">
-              <p>Total Parks: {regions['Costa Rica']?.length || 0}</p>
+              <p>Total National Parks: {regions['Costa Rica']?.length || 0}</p>
               {stats.topCostaRicaStates.length > 0 && (
                 <div>
                   <p><strong>Top 10 Provinces:</strong></p>
@@ -286,6 +244,142 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
                       </li>
                     ))}
                   </ol>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="country-item">
+          <div 
+            className="country-header"
+            onClick={() => toggleCountry('South East Asia')}
+          >
+            <span className="country-name">🌏 South East Asia</span>
+            <span className="country-count">{regions['SouthEastAsia-UNESCO']?.length || 0}</span>
+            <span className="collapse-icon">{expandedCountries['South East Asia'] ? '▼' : '▶'}</span>
+          </div>
+          {expandedCountries['South East Asia'] && (
+            <div className="country-details">
+              <p>Total UNESCO Sites: {regions['SouthEastAsia-UNESCO']?.length || 0}</p>
+              {stats.topSoutheastAsiaCountries && stats.topSoutheastAsiaCountries.length > 0 && (
+                <div>
+                  <p><strong>Countries:</strong></p>
+                  <ol>
+                    {stats.topSoutheastAsiaCountries.map(([country, count]) => (
+                      <li key={country}>
+                        {country}: {count} site{count > 1 ? 's' : ''}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="country-item">
+          <div 
+            className="country-header"
+            onClick={() => toggleCountry('East Asia')}
+          >
+            <span className="country-name">🏛️ East Asia</span>
+            <span className="country-count">{regions['EastAsia-UNESCO']?.length || 0}</span>
+            <span className="collapse-icon">{expandedCountries['East Asia'] ? '▼' : '▶'}</span>
+          </div>
+          {expandedCountries['East Asia'] && (
+            <div className="country-details">
+              <p>Total UNESCO Sites: {regions['EastAsia-UNESCO']?.length || 0}</p>
+              {stats.topEastAsiaCountries && stats.topEastAsiaCountries.length > 0 && (
+                <div>
+                  <p><strong>Countries:</strong></p>
+                  <ol>
+                    {stats.topEastAsiaCountries.map(([country, count]) => (
+                      <li key={country}>
+                        {country}: {count} site{count > 1 ? 's' : ''}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="country-item">
+          <div 
+            className="country-header"
+            onClick={() => toggleCountry('South Asia')}
+          >
+            <span className="country-name">🏛️ South Asia</span>
+            <span className="country-count">{(regions['Nepal-Parks']?.length || 0) + (regions['Nepal-Temples']?.length || 0) + (regions['Nepal-UNESCO']?.length || 0) + (regions['Nepal-TrekkingFlights']?.length || 0) + (regions['Sri Lanka-Parks']?.length || 0) + (regions['Sri Lanka-Temples']?.length || 0) + (regions['Sri Lanka-UNESCO']?.length || 0) + (regions['SouthAsia-UNESCO']?.length || 0)}</span>
+            <span className="collapse-icon">{expandedCountries['South Asia'] ? '▼' : '▶'}</span>
+          </div>
+          {expandedCountries['South Asia'] && (
+            <div className="country-details">
+              <p>Total Attractions: {(regions['Nepal-Parks']?.length || 0) + (regions['Nepal-Temples']?.length || 0) + (regions['Nepal-UNESCO']?.length || 0) + (regions['Nepal-TrekkingFlights']?.length || 0) + (regions['Sri Lanka-Parks']?.length || 0) + (regions['Sri Lanka-Temples']?.length || 0) + (regions['Sri Lanka-UNESCO']?.length || 0) + (regions['SouthAsia-UNESCO']?.length || 0)}</p>
+              
+              {/* Nepal */}
+              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                <p><strong>🇳🇵 Nepal:</strong> {(regions['Nepal-Parks']?.length || 0) + (regions['Nepal-Temples']?.length || 0) + (regions['Nepal-UNESCO']?.length || 0) + (regions['Nepal-TrekkingFlights']?.length || 0)} attractions</p>
+                <ul>
+                  <li>🏞️ National Parks: {regions['Nepal-Parks']?.length || 0}</li>
+                  <li>🕉️ Temples: {regions['Nepal-Temples']?.length || 0}</li>
+                  <li>🏛️ UNESCO Sites: {regions['Nepal-UNESCO']?.length || 0}</li>
+                  <li>⛰️ Trekking: {regions['Nepal-TrekkingFlights']?.length || 0}</li>
+                </ul>
+                {stats.topNepalStates.length > 0 && (
+                  <div>
+                    <p><strong>Top Provinces/Districts:</strong></p>
+                    <ol>
+                      {stats.topNepalStates.slice(0, 5).map(([state, count]) => (
+                        <li key={state}>
+                          {state}: {count} attraction{count > 1 ? 's' : ''}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
+              
+              {/* Sri Lanka */}
+              <div style={{ marginTop: '10px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                <p><strong>🇱🇰 Sri Lanka:</strong> {(regions['Sri Lanka-Parks']?.length || 0) + (regions['Sri Lanka-Temples']?.length || 0) + (regions['Sri Lanka-UNESCO']?.length || 0)} attractions</p>
+                <ul>
+                  <li>🏞️ National Parks: {regions['Sri Lanka-Parks']?.length || 0}</li>
+                  <li>🕉️ Temples: {regions['Sri Lanka-Temples']?.length || 0}</li>
+                  <li>🏛️ UNESCO Sites: {regions['Sri Lanka-UNESCO']?.length || 0}</li>
+                </ul>
+                {stats.topSriLankaStates.length > 0 && (
+                  <div>
+                    <p><strong>Top Provinces:</strong></p>
+                    <ol>
+                      {stats.topSriLankaStates.slice(0, 5).map(([state, count]) => (
+                        <li key={state}>
+                          {state}: {count} attraction{count > 1 ? 's' : ''}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
+              
+              {/* Other South Asian countries */}
+              {regions['SouthAsia-UNESCO'] && regions['SouthAsia-UNESCO'].length > 0 && (
+                <div style={{ marginTop: '10px' }}>
+                  <p><strong>Other South Asia UNESCO Sites:</strong> {regions['SouthAsia-UNESCO'].length}</p>
+                  {stats.topSouthAsiaCountries && stats.topSouthAsiaCountries.length > 0 && (
+                    <div>
+                      <p><strong>Countries:</strong></p>
+                      <ol>
+                        {stats.topSouthAsiaCountries.map(([country, count]) => (
+                          <li key={country}>
+                            {country}: {count} site{count > 1 ? 's' : ''}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

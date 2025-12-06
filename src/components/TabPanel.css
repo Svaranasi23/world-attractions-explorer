@@ -265,6 +265,7 @@
 .tab-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: visible;
   padding: 15px;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }

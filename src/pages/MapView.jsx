@@ -194,7 +194,9 @@ function MapView() {
     'Sri Lanka-Temples': true,
     'Sri Lanka-UNESCO': true,
     'Costa Rica': true,
-    'Asia-UNESCO': true
+    'SouthEastAsia-UNESCO': true,
+    'EastAsia-UNESCO': true,
+    'SouthAsia-UNESCO': true
   })
   const [showHeatMap, setShowHeatMap] = useState(false)
   const [showAirports, setShowAirports] = useState(false)
@@ -352,9 +354,15 @@ function MapView() {
         }
       } else if (country === 'Costa Rica') {
         region = 'Costa Rica'
-      } else if (['China', 'Japan', 'Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Bangladesh', 'Pakistan'].includes(country)) {
-        // All new Asian UNESCO sites go to Asia-UNESCO region
-        region = 'Asia-UNESCO'
+      } else if (['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor'].includes(country)) {
+        // South East Asian countries
+        region = 'SouthEastAsia-UNESCO'
+      } else if (['China', 'Japan', 'South Korea', 'North Korea', 'Mongolia'].includes(country)) {
+        // East Asian countries
+        region = 'EastAsia-UNESCO'
+      } else if (['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives'].includes(country)) {
+        // South Asian countries (excluding India, Nepal, Sri Lanka)
+        region = 'SouthAsia-UNESCO'
       } else if (country === 'United States') {
         if (states.includes('AK')) {
           region = 'Alaska'
@@ -580,7 +588,9 @@ function MapView() {
         'Sri Lanka-Temples': { center: [7.2944, 80.6414], zoom: 8 },
         'Sri Lanka-UNESCO': { center: [7.8731, 80.7718], zoom: 7 },
         'Costa Rica': { center: [9.7489, -83.7534], zoom: 7 },
-        'Asia-UNESCO': { center: [25.0, 100.0], zoom: 4 }
+        'SouthEastAsia-UNESCO': { center: [5.0, 105.0], zoom: 5 },
+        'EastAsia-UNESCO': { center: [35.0, 120.0], zoom: 4 },
+        'SouthAsia-UNESCO': { center: [28.0, 75.0], zoom: 5 }
       }
       return countryCenters[regionName] || null
     }
