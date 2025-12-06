@@ -12,10 +12,24 @@ export const loadCSVData = async (filename) => {
       Papa.parse(text, {
         header: true,
         skipEmptyLines: true,
+        quoteChar: '"',
+        escapeChar: '"',
         complete: (results) => {
+          // Debug: Log parsing results for Nepal_Temples.csv
+          if (filename === 'Nepal_Temples.csv') {
+            const pashupatinath = results.data.find(r => r.Park_Code === 'PAS' || (r.Name && r.Name.includes('Pashupatinath')))
+            if (pashupatinath) {
+              console.log('✅ Pashupatinath found in CSV parse:', pashupatinath)
+            } else {
+              console.warn('⚠️ Pashupatinath NOT found in CSV parse results')
+              console.log('Total rows parsed:', results.data.length)
+              console.log('Sample rows:', results.data.slice(0, 3))
+            }
+          }
           resolve(results.data)
         },
         error: (error) => {
+          console.error(`Error parsing ${filename}:`, error)
           reject(error)
         }
       })
@@ -31,7 +45,7 @@ export const loadCSVData = async (filename) => {
  */
 export const loadParksData = async () => {
   try {
-    const [usParks, canadianParks, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, chinaUnescoSites, japanUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, bangladeshUnescoSites, pakistanUnescoSites] = await Promise.all([
+    const [usParks, canadianParks, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites] = await Promise.all([
       loadCSVData('US_National_Parks.csv'),
       loadCSVData('Canadian_National_Parks.csv').catch(() => []),
       loadCSVData('Indian_National_Parks.csv').catch(() => []),
@@ -50,15 +64,50 @@ export const loadParksData = async () => {
       loadCSVData('Sri_Lanka_Temples.csv').catch(() => []),
       loadCSVData('Sri_Lanka_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Costa_Rica_National_Parks.csv').catch(() => []),
+      // East Asia
       loadCSVData('China_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Japan_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('South_Korea_UNESCO_Sites.csv').catch(() => []),
+      // South East Asia
       loadCSVData('Thailand_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Indonesia_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Vietnam_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Cambodia_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Myanmar_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Philippines_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Malaysia_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Singapore_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Laos_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Brunei_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('East_Timor_UNESCO_Sites.csv').catch(() => []),
+      // South Asia
       loadCSVData('Bangladesh_UNESCO_Sites.csv').catch(() => []),
-      loadCSVData('Pakistan_UNESCO_Sites.csv').catch(() => [])
+      loadCSVData('Pakistan_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Afghanistan_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Bhutan_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Maldives_UNESCO_Sites.csv').catch(() => []),
+      // Central Asia
+      loadCSVData('Kazakhstan_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Kyrgyzstan_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Tajikistan_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Turkmenistan_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Uzbekistan_UNESCO_Sites.csv').catch(() => []),
+      // West Asia / Middle East
+      loadCSVData('Iran_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Iraq_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Jordan_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Lebanon_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Saudi_Arabia_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Syria_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Turkey_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('UAE_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Yemen_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Oman_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Qatar_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Kuwait_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Bahrain_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Israel_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Palestine_UNESCO_Sites.csv').catch(() => [])
     ])
     
     // Process US parks
@@ -204,20 +253,67 @@ export const loadParksData = async () => {
     }))
     
     // Process Nepal temples
-    const processedNepalTemples = nepalTemples.map(temple => ({
-      Park_Code: temple.Park_Code || '',
-      Name: temple.Name || '',
-      Designation: temple.Designation || 'Temple',
-      States: temple.States || '',
-      Latitude: temple.Latitude || '0',
-      Longitude: temple.Longitude || '0',
-      Description: temple.Description || `Temple in ${temple.States || ''}`,
-      URL: temple.URL || '',
-      Country: 'Nepal',
-      NepalCategory: 'Temples',
-      Temple_Type: temple.Temple_Type || '',
-      id: `np-temple-${temple.Park_Code || Math.random()}`
-    }))
+    const processedNepalTemples = nepalTemples
+      .filter(temple => {
+        // Filter out invalid entries
+        const name = (temple.Name || '').trim()
+        const lat = parseFloat(temple.Latitude || '0')
+        const lon = parseFloat(temple.Longitude || '0')
+        return name !== '' && !isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0
+      })
+      .map(temple => ({
+        Park_Code: temple.Park_Code || '',
+        Name: temple.Name || '',
+        Designation: temple.Designation || 'Temple',
+        States: temple.States || '',
+        Latitude: temple.Latitude || '0',
+        Longitude: temple.Longitude || '0',
+        Description: temple.Description || `Temple in ${temple.States || ''}`,
+        URL: temple.URL || '',
+        Country: 'Nepal',
+        NepalCategory: 'Temples',
+        Temple_Type: temple.Temple_Type || '',
+        id: `np-temple-${temple.Park_Code || Math.random()}`
+      }))
+      .filter((temple, index, array) => {
+        // If Pashupatinath and Guhyeshwari share the same coordinates, show only Pashupatinath
+        const lat = parseFloat(temple.Latitude)
+        const lon = parseFloat(temple.Longitude)
+        const isPashupatinath = temple.Park_Code === 'PAS' || (temple.Name && temple.Name.includes('Pashupatinath'))
+        const isGuhyeshwari = temple.Park_Code === 'GUH' || (temple.Name && temple.Name.includes('Guhyeshwari'))
+        
+        // Always keep Pashupatinath
+        if (isPashupatinath) {
+          return true
+        }
+        
+        // If this is Guhyeshwari, check if Pashupatinath exists at the same coordinates
+        if (isGuhyeshwari) {
+          const pashupatinathAtSameLocation = array.find(t => {
+            const tLat = parseFloat(t.Latitude)
+            const tLon = parseFloat(t.Longitude)
+            const isPash = t.Park_Code === 'PAS' || (t.Name && t.Name.includes('Pashupatinath'))
+            return isPash &&
+                   Math.abs(tLat - lat) < 0.0001 && Math.abs(tLon - lon) < 0.0001
+          })
+          // If Pashupatinath exists at the same location, filter out Guhyeshwari
+          if (pashupatinathAtSameLocation) {
+            console.log('🚫 Filtering out Guhyeshwari (same location as Pashupatinath)')
+            return false
+          }
+        }
+        return true
+      })
+    
+    // Debug: Log Pashupatinath specifically
+    const pashupatinath = processedNepalTemples.find(t => t.Park_Code === 'PAS' || t.Name.includes('Pashupatinath'))
+    if (pashupatinath) {
+      console.log('✅ Pashupatinath Temple loaded:', pashupatinath)
+    } else {
+      console.warn('⚠️ Pashupatinath Temple NOT found in processed temples')
+      console.log('Total Nepal temples loaded:', processedNepalTemples.length)
+      console.log('Sample temple:', processedNepalTemples[0])
+    }
     
     // Process Nepal UNESCO sites
     const processedNepalUnesco = nepalUnescoSites.map(site => ({
@@ -440,6 +536,61 @@ export const loadParksData = async () => {
       id: `pk-unesco-${site.Park_Code || Math.random()}`
     }))
     
+    // Helper function to process UNESCO sites
+    const processUnescoSites = (sites, country, countryCode) => {
+      return sites.map(site => ({
+        Park_Code: site.Park_Code || '',
+        Name: site.Name || '',
+        Designation: site.Designation || 'UNESCO World Heritage Site',
+        States: site.States || '',
+        Latitude: site.Latitude || '0',
+        Longitude: site.Longitude || '0',
+        Description: site.Description || `UNESCO World Heritage Site in ${site.States || ''}`,
+        URL: site.URL || '',
+        Country: country,
+        UNESCO_Year: site.UNESCO_Year || '',
+        id: `${countryCode}-unesco-${site.Park_Code || Math.random()}`
+      }))
+    }
+    
+    // Process remaining South East Asian UNESCO sites
+    const processedSouthKoreaUnesco = processUnescoSites(southKoreaUnescoSites, 'South Korea', 'kr')
+    const processedPhilippinesUnesco = processUnescoSites(philippinesUnescoSites, 'Philippines', 'ph')
+    const processedMalaysiaUnesco = processUnescoSites(malaysiaUnescoSites, 'Malaysia', 'my')
+    const processedSingaporeUnesco = processUnescoSites(singaporeUnescoSites, 'Singapore', 'sg')
+    const processedLaosUnesco = processUnescoSites(laosUnescoSites, 'Laos', 'la')
+    const processedBruneiUnesco = processUnescoSites(bruneiUnescoSites, 'Brunei', 'bn')
+    const processedEastTimorUnesco = processUnescoSites(eastTimorUnescoSites, 'East Timor', 'tl')
+    
+    // Process remaining South Asian UNESCO sites
+    const processedAfghanistanUnesco = processUnescoSites(afghanistanUnescoSites, 'Afghanistan', 'af')
+    const processedBhutanUnesco = processUnescoSites(bhutanUnescoSites, 'Bhutan', 'bt')
+    const processedMaldivesUnesco = processUnescoSites(maldivesUnescoSites, 'Maldives', 'mv')
+    
+    // Process Central Asian UNESCO sites
+    const processedKazakhstanUnesco = processUnescoSites(kazakhstanUnescoSites, 'Kazakhstan', 'kz')
+    const processedKyrgyzstanUnesco = processUnescoSites(kyrgyzstanUnescoSites, 'Kyrgyzstan', 'kg')
+    const processedTajikistanUnesco = processUnescoSites(tajikistanUnescoSites, 'Tajikistan', 'tj')
+    const processedTurkmenistanUnesco = processUnescoSites(turkmenistanUnescoSites, 'Turkmenistan', 'tm')
+    const processedUzbekistanUnesco = processUnescoSites(uzbekistanUnescoSites, 'Uzbekistan', 'uz')
+    
+    // Process West Asian / Middle Eastern UNESCO sites
+    const processedIranUnesco = processUnescoSites(iranUnescoSites, 'Iran', 'ir')
+    const processedIraqUnesco = processUnescoSites(iraqUnescoSites, 'Iraq', 'iq')
+    const processedJordanUnesco = processUnescoSites(jordanUnescoSites, 'Jordan', 'jo')
+    const processedLebanonUnesco = processUnescoSites(lebanonUnescoSites, 'Lebanon', 'lb')
+    const processedSaudiArabiaUnesco = processUnescoSites(saudiArabiaUnescoSites, 'Saudi Arabia', 'sa')
+    const processedSyriaUnesco = processUnescoSites(syriaUnescoSites, 'Syria', 'sy')
+    const processedTurkeyUnesco = processUnescoSites(turkeyUnescoSites, 'Turkey', 'tr')
+    const processedUaeUnesco = processUnescoSites(uaeUnescoSites, 'UAE', 'ae')
+    const processedYemenUnesco = processUnescoSites(yemenUnescoSites, 'Yemen', 'ye')
+    const processedOmanUnesco = processUnescoSites(omanUnescoSites, 'Oman', 'om')
+    const processedQatarUnesco = processUnescoSites(qatarUnescoSites, 'Qatar', 'qa')
+    const processedKuwaitUnesco = processUnescoSites(kuwaitUnescoSites, 'Kuwait', 'kw')
+    const processedBahrainUnesco = processUnescoSites(bahrainUnescoSites, 'Bahrain', 'bh')
+    const processedIsraelUnesco = processUnescoSites(israelUnescoSites, 'Israel', 'il')
+    const processedPalestineUnesco = processUnescoSites(palestineUnescoSites, 'Palestine', 'ps')
+    
     // Process Indian Mutts
     const processedIndianMutts = indianMutts
       .filter(mutt => {
@@ -512,7 +663,23 @@ export const loadParksData = async () => {
         id: `in-fort-${fort.Park_Code || Math.random()}`
       }))
     
-    return [...processedUSParks, ...processedCanadianParks, ...processedIndianParks, ...processedIndianUnesco, ...processedIndianJyotirlinga, ...processedIndianShaktiPeethas, ...processedIndianOtherTemples, ...processedIndianMutts, ...processedIndianDivyaDesams, ...processedIndianForts, ...processedNepalParks, ...processedNepalTemples, ...processedNepalUnesco, ...processedNepalTrekkingFlights, ...processedSriLankaParks, ...processedSriLankaTemples, ...processedSriLankaUnesco, ...processedCostaRicaParks, ...processedChinaUnesco, ...processedJapanUnesco, ...processedThailandUnesco, ...processedIndonesiaUnesco, ...processedVietnamUnesco, ...processedCambodiaUnesco, ...processedMyanmarUnesco, ...processedBangladeshUnesco, ...processedPakistanUnesco]
+    return [
+      ...processedUSParks, ...processedCanadianParks, 
+      ...processedIndianParks, ...processedIndianUnesco, ...processedIndianJyotirlinga, ...processedIndianShaktiPeethas, ...processedIndianOtherTemples, ...processedIndianMutts, ...processedIndianDivyaDesams, ...processedIndianForts, 
+      ...processedNepalParks, ...processedNepalTemples, ...processedNepalUnesco, ...processedNepalTrekkingFlights, 
+      ...processedSriLankaParks, ...processedSriLankaTemples, ...processedSriLankaUnesco, 
+      ...processedCostaRicaParks, 
+      // East Asia
+      ...processedChinaUnesco, ...processedJapanUnesco, ...processedSouthKoreaUnesco,
+      // South East Asia
+      ...processedThailandUnesco, ...processedIndonesiaUnesco, ...processedVietnamUnesco, ...processedCambodiaUnesco, ...processedMyanmarUnesco, ...processedPhilippinesUnesco, ...processedMalaysiaUnesco, ...processedSingaporeUnesco, ...processedLaosUnesco, ...processedBruneiUnesco, ...processedEastTimorUnesco,
+      // South Asia
+      ...processedBangladeshUnesco, ...processedPakistanUnesco, ...processedAfghanistanUnesco, ...processedBhutanUnesco, ...processedMaldivesUnesco,
+      // Central Asia
+      ...processedKazakhstanUnesco, ...processedKyrgyzstanUnesco, ...processedTajikistanUnesco, ...processedTurkmenistanUnesco, ...processedUzbekistanUnesco,
+      // West Asia / Middle East
+      ...processedIranUnesco, ...processedIraqUnesco, ...processedJordanUnesco, ...processedLebanonUnesco, ...processedSaudiArabiaUnesco, ...processedSyriaUnesco, ...processedTurkeyUnesco, ...processedUaeUnesco, ...processedYemenUnesco, ...processedOmanUnesco, ...processedQatarUnesco, ...processedKuwaitUnesco, ...processedBahrainUnesco, ...processedIsraelUnesco, ...processedPalestineUnesco
+    ]
   } catch (error) {
     console.error('Error loading parks data:', error)
     return []
@@ -652,7 +819,9 @@ export const categorizeParksByRegion = (parks) => {
     'Costa Rica': [],
     'SouthEastAsia-UNESCO': [],
     'EastAsia-UNESCO': [],
-    'SouthAsia-UNESCO': []
+    'SouthAsia-UNESCO': [],
+    'CentralAsia-UNESCO': [],
+    'WestAsia-UNESCO': []
   }
   
   parks.forEach(park => {
@@ -712,15 +881,15 @@ export const categorizeParksByRegion = (parks) => {
     } else if (['China', 'Japan', 'South Korea', 'North Korea', 'Mongolia'].includes(country)) {
       // East Asian countries
       regions['EastAsia-UNESCO'].push(park)
-    } else if (['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives', 'Nepal', 'Sri Lanka'].includes(country)) {
-      // South Asian countries (Nepal and Sri Lanka are now included here, but also kept in their specific sub-regions)
-      // Note: Nepal and Sri Lanka parks are also added to their specific sub-regions above
-      if (country === 'Nepal' || country === 'Sri Lanka') {
-        // These are already handled above in their specific sub-regions, but we also add to SouthAsia for grouping
-        regions['SouthAsia-UNESCO'].push(park)
-      } else {
-        regions['SouthAsia-UNESCO'].push(park)
-      }
+    } else if (['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives'].includes(country)) {
+      // South Asian countries (excluding Nepal and Sri Lanka which are handled separately above)
+      regions['SouthAsia-UNESCO'].push(park)
+    } else if (['Kazakhstan', 'Kyrgyzstan', 'Tajikistan', 'Turkmenistan', 'Uzbekistan'].includes(country)) {
+      // Central Asian countries
+      regions['CentralAsia-UNESCO'].push(park)
+    } else if (['Iran', 'Iraq', 'Jordan', 'Lebanon', 'Saudi Arabia', 'Syria', 'Turkey', 'UAE', 'United Arab Emirates', 'Yemen', 'Oman', 'Qatar', 'Kuwait', 'Bahrain', 'Israel', 'Palestine'].includes(country)) {
+      // West Asian / Middle Eastern countries
+      regions['WestAsia-UNESCO'].push(park)
     } else {
       if (states.includes('AK')) {
         regions.Alaska.push(park)

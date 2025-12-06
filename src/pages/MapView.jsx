@@ -196,7 +196,9 @@ function MapView() {
     'Costa Rica': true,
     'SouthEastAsia-UNESCO': true,
     'EastAsia-UNESCO': true,
-    'SouthAsia-UNESCO': true
+    'SouthAsia-UNESCO': true,
+    'CentralAsia-UNESCO': true,
+    'WestAsia-UNESCO': true
   })
   const [showHeatMap, setShowHeatMap] = useState(false)
   const [showAirports, setShowAirports] = useState(false)
@@ -277,6 +279,28 @@ function MapView() {
   }, [parks])
 
   const filteredParks = useMemo(() => {
+    // Debug: Check if Pashupatinath is in the parks array
+    const pashupatinathInParks = parks.find(p => p.Park_Code === 'PAS' || (p.Name && p.Name.includes('Pashupatinath')))
+    if (pashupatinathInParks) {
+      console.log('✅ Pashupatinath found in parks array:', {
+        name: pashupatinathInParks.Name,
+        country: pashupatinathInParks.Country,
+        nepalCategory: pashupatinathInParks.NepalCategory,
+        lat: pashupatinathInParks.Latitude,
+        lon: pashupatinathInParks.Longitude
+      })
+    } else {
+      console.warn('⚠️ Pashupatinath NOT found in parks array')
+      console.log('Total parks:', parks.length)
+      const nepalParks = parks.filter(p => p.Country === 'Nepal')
+      console.log('Nepal parks count:', nepalParks.length)
+      const nepalTemples = nepalParks.filter(p => p.NepalCategory === 'Temples')
+      console.log('Nepal temples count:', nepalTemples.length)
+      if (nepalTemples.length > 0) {
+        console.log('Sample Nepal temple:', nepalTemples[0])
+      }
+    }
+    
     // If all regions are explicitly set to false or undefined, return empty array
     const allRegionsHidden = Object.values(visibleRegions).every(value => value === false || value === undefined)
     if (allRegionsHidden) {
@@ -343,6 +367,19 @@ function MapView() {
           // Default to Nepal-Parks for all other Nepal entries
           region = 'Nepal-Parks'
         }
+        
+        // Debug: Log Pashupatinath specifically
+        if (park.Park_Code === 'PAS' || (park.Name && park.Name.includes('Pashupatinath'))) {
+          console.log('🔍 Pashupatinath in filteredParks:', {
+            name: park.Name,
+            country: park.Country,
+            nepalCategory: park.NepalCategory,
+            region: region,
+            lat: park.Latitude,
+            lon: park.Longitude,
+            visible: visibleRegions[region]
+          })
+        }
       } else if (country === 'Sri Lanka') {
         // Use SriLankaCategory to determine sub-region
         if (park.SriLankaCategory === 'UNESCO') {
@@ -363,6 +400,12 @@ function MapView() {
       } else if (['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives'].includes(country)) {
         // South Asian countries (excluding India, Nepal, Sri Lanka)
         region = 'SouthAsia-UNESCO'
+      } else if (['Kazakhstan', 'Kyrgyzstan', 'Tajikistan', 'Turkmenistan', 'Uzbekistan'].includes(country)) {
+        // Central Asian countries
+        region = 'CentralAsia-UNESCO'
+      } else if (['Iran', 'Iraq', 'Jordan', 'Lebanon', 'Saudi Arabia', 'Syria', 'Turkey', 'UAE', 'United Arab Emirates', 'Yemen', 'Oman', 'Qatar', 'Kuwait', 'Bahrain', 'Israel', 'Palestine'].includes(country)) {
+        // West Asian / Middle Eastern countries
+        region = 'WestAsia-UNESCO'
       } else if (country === 'United States') {
         if (states.includes('AK')) {
           region = 'Alaska'
@@ -590,7 +633,9 @@ function MapView() {
         'Costa Rica': { center: [9.7489, -83.7534], zoom: 7 },
         'SouthEastAsia-UNESCO': { center: [5.0, 105.0], zoom: 5 },
         'EastAsia-UNESCO': { center: [35.0, 120.0], zoom: 4 },
-        'SouthAsia-UNESCO': { center: [28.0, 75.0], zoom: 5 }
+        'SouthAsia-UNESCO': { center: [28.0, 75.0], zoom: 5 },
+        'CentralAsia-UNESCO': { center: [45.0, 70.0], zoom: 4 },
+        'WestAsia-UNESCO': { center: [30.0, 45.0], zoom: 4 }
       }
       return countryCenters[regionName] || null
     }
