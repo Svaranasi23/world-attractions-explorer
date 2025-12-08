@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, FeatureGroup, LayerGroup, useMap, GeoJSON, ZoomControl } from 'react-leaflet'
+import React, { useState, useEffect, useMemo, useRef, createRef } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, FeatureGroup, LayerGroup, useMap, GeoJSON, ZoomControl, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet.heat'
@@ -7,6 +7,7 @@ import { loadParksData, loadAirportsData, findNearbyAirports, findNearbyParks, c
 import TabPanel from '../components/TabPanel'
 import MapController from '../components/MapController'
 import AttractionTypeFilter from '../components/AttractionTypeFilter'
+import AttractionSearch from '../components/AttractionSearch'
 import './MapView.css'
 
 // Fix for default marker icons in React Leaflet
@@ -208,6 +209,10 @@ function MapView() {
   const [mapFocus, setMapFocus] = useState(null)
   const mapRef = useRef(null)
   const [filterPanelOpen, setFilterPanelOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedParkForPopup, setSelectedParkForPopup] = useState(null)
+  const [selectedParkId, setSelectedParkId] = useState(null)
+  const markerRefs = useRef({})
   const [visibleAttractionTypes, setVisibleAttractionTypes] = useState({
     NationalParks: true,
     UNESCO: true,
@@ -217,7 +222,8 @@ function MapView() {
     Mutts: true,
     DivyaDesam: true,
     Forts: true,
-    TrekkingFlights: true
+    TrekkingFlights: true,
+    MostPhotographed: true
   })
 
   useEffect(() => {
@@ -279,6 +285,170 @@ function MapView() {
     return categorizeParksByRegion(parks)
   }, [parks])
 
+  // Determine which attraction types are available in the currently visible regions
+  const availableAttractionTypes = useMemo(() => {
+    const availableTypes = new Set()
+    
+    // Get all parks in visible regions
+    const visibleParks = parks.filter(park => {
+      const country = park.Country || 'United States'
+      const states = (park.States || '').split(',').map(s => s.trim())
+      
+      let region = null
+      
+      // Check for Shakti Peethas first
+      if (park.IndiaCategory === 'ShaktiPeetha') {
+        region = 'India-ShaktiPeetha'
+      } else if (country === 'Canada') {
+        region = 'Canada'
+      } else if (country === 'India') {
+        if (park.IndiaCategory === 'UNESCO') {
+          region = 'India-UNESCO'
+        } else if (park.IndiaCategory === 'Jyotirlinga') {
+          region = 'India-Jyotirlinga'
+        } else if (park.IndiaCategory === 'ShaktiPeetha') {
+          region = 'India-ShaktiPeetha'
+        } else if (park.IndiaCategory === 'OtherTemples') {
+          region = 'India-OtherTemples'
+        } else if (park.IndiaCategory === 'Mutts') {
+          region = 'India-Mutts'
+        } else if (park.IndiaCategory === 'DivyaDesam') {
+          region = 'India-DivyaDesam'
+        } else if (park.IndiaCategory === 'Forts') {
+          region = 'India-Forts'
+        } else {
+          region = 'India-Parks'
+        }
+      } else if (country === 'Nepal') {
+        if (park.NepalCategory === 'UNESCO') {
+          region = 'Nepal-UNESCO'
+        } else if (park.NepalCategory === 'Temples') {
+          region = 'Nepal-Temples'
+        } else if (park.NepalCategory === 'TrekkingFlights') {
+          region = 'Nepal-TrekkingFlights'
+        } else {
+          region = 'Nepal-Parks'
+        }
+      } else if (country === 'Sri Lanka') {
+        if (park.SriLankaCategory === 'UNESCO') {
+          region = 'Sri Lanka-UNESCO'
+        } else if (park.SriLankaCategory === 'Temples') {
+          region = 'Sri Lanka-Temples'
+        } else {
+          region = 'Sri Lanka-Parks'
+        }
+      } else if (country === 'Costa Rica') {
+        region = 'Costa Rica'
+      } else if (['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor'].includes(country)) {
+        region = 'SouthEastAsia-UNESCO'
+      } else if (['China', 'Japan', 'South Korea', 'North Korea', 'Mongolia'].includes(country)) {
+        region = 'EastAsia-UNESCO'
+      } else if (['Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives'].includes(country)) {
+        region = 'SouthAsia-UNESCO'
+      } else if (['Kazakhstan', 'Kyrgyzstan', 'Tajikistan', 'Turkmenistan', 'Uzbekistan'].includes(country)) {
+        region = 'CentralAsia-UNESCO'
+      } else if (['Iran', 'Iraq', 'Jordan', 'Lebanon', 'Saudi Arabia', 'Syria', 'Turkey', 'UAE', 'United Arab Emirates', 'Yemen', 'Oman', 'Qatar', 'Kuwait', 'Bahrain', 'Israel', 'Palestine'].includes(country)) {
+        region = 'WestAsia-UNESCO'
+      } else if (['Belize', 'Guatemala', 'Honduras', 'El Salvador', 'Nicaragua', 'Panama', 'Mexico'].includes(country)) {
+        region = 'CentralAmerica-UNESCO'
+      } else if (country === 'United States') {
+        // US regions
+        const stateCodes = states.map(s => {
+          const parts = s.split(' ')
+          return parts[parts.length - 1]
+        })
+        if (stateCodes.some(code => ['CA', 'OR', 'WA', 'NV', 'ID', 'MT', 'WY', 'UT', 'CO', 'AZ', 'NM'].includes(code))) {
+          region = 'West'
+        } else if (stateCodes.some(code => ['ND', 'SD', 'NE', 'KS', 'MN', 'IA', 'MO', 'WI', 'IL', 'MI', 'IN', 'OH'].includes(code))) {
+          region = 'Midwest'
+        } else if (stateCodes.some(code => ['TX', 'OK', 'AR', 'LA', 'MS', 'AL', 'TN', 'KY', 'WV', 'VA', 'NC', 'SC', 'GA', 'FL'].includes(code))) {
+          region = 'South'
+        } else if (stateCodes.some(code => ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA', 'MD', 'DE'].includes(code))) {
+          region = 'Northeast'
+        } else if (stateCodes.includes('AK')) {
+          region = 'Alaska'
+        } else if (stateCodes.includes('HI')) {
+          region = 'Hawaii'
+        }
+      }
+      
+      return region && visibleRegions[region] === true
+    })
+    
+    // Determine attraction types from visible parks
+    visibleParks.forEach(park => {
+      const country = park.Country || 'United States'
+      const description = park.Description ? String(park.Description).toLowerCase() : ''
+      const name = park.Name ? String(park.Name).toLowerCase() : ''
+      
+      const isMostPhotographed = description.includes('most photographed') || 
+                                 description.includes('popular photography') ||
+                                 name.includes('most photographed')
+      
+      // Check if it's most photographed
+      if (isMostPhotographed) {
+        availableTypes.add('MostPhotographed')
+      }
+      
+      if (park.IndiaCategory === 'Jyotirlinga') {
+        availableTypes.add('Jyotirlinga')
+      } else if (park.IndiaCategory === 'ShaktiPeetha') {
+        availableTypes.add('ShaktiPeetha')
+      } else if (park.IndiaCategory === 'Mutts') {
+        availableTypes.add('Mutts')
+      } else if (park.IndiaCategory === 'DivyaDesam') {
+        availableTypes.add('DivyaDesam')
+      } else if (park.IndiaCategory === 'Forts') {
+        availableTypes.add('Forts')
+      } else if (park.IndiaCategory === 'UNESCO' || park.NepalCategory === 'UNESCO' || park.SriLankaCategory === 'UNESCO' || 
+                 (park.Designation && park.Designation.toUpperCase().includes('UNESCO')) ||
+                 ['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor',
+                  'China', 'Japan', 'South Korea', 'North Korea', 'Mongolia',
+                  'Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives',
+                  'Kazakhstan', 'Kyrgyzstan', 'Tajikistan', 'Turkmenistan', 'Uzbekistan',
+                  'Iran', 'Iraq', 'Jordan', 'Lebanon', 'Saudi Arabia', 'Syria', 'Turkey', 'UAE', 'United Arab Emirates', 'Yemen', 'Oman', 'Qatar', 'Kuwait', 'Bahrain', 'Israel', 'Palestine',
+                  'Belize', 'Guatemala', 'Honduras', 'El Salvador', 'Nicaragua', 'Panama', 'Mexico'].includes(country)) {
+        availableTypes.add('UNESCO')
+      } else if (park.IndiaCategory === 'OtherTemples' || park.NepalCategory === 'Temples' || park.SriLankaCategory === 'Temples') {
+        availableTypes.add('Temples')
+      } else if (park.NepalCategory === 'TrekkingFlights') {
+        availableTypes.add('TrekkingFlights')
+      } else {
+        availableTypes.add('NationalParks')
+      }
+    })
+    
+    // If all regions are visible (World Attractions view), show all types
+    const allRegionsVisible = Object.values(visibleRegions).every(value => value === true)
+    if (allRegionsVisible) {
+      return {
+        NationalParks: true,
+        UNESCO: true,
+        Temples: true,
+        Jyotirlinga: true,
+        ShaktiPeetha: true,
+        Mutts: true,
+        DivyaDesam: true,
+        Forts: true,
+        TrekkingFlights: true,
+        MostPhotographed: true
+      }
+    }
+    
+    return {
+      NationalParks: availableTypes.has('NationalParks'),
+      UNESCO: availableTypes.has('UNESCO'),
+      Temples: availableTypes.has('Temples'),
+      Jyotirlinga: availableTypes.has('Jyotirlinga'),
+      ShaktiPeetha: availableTypes.has('ShaktiPeetha'),
+      Mutts: availableTypes.has('Mutts'),
+      DivyaDesam: availableTypes.has('DivyaDesam'),
+      Forts: availableTypes.has('Forts'),
+      TrekkingFlights: availableTypes.has('TrekkingFlights'),
+      MostPhotographed: availableTypes.has('MostPhotographed')
+    }
+  }, [parks, visibleRegions])
+
   const heatMapData = useMemo(() => {
     return parks
       .map(park => {
@@ -293,27 +463,6 @@ function MapView() {
   }, [parks])
 
   const filteredParks = useMemo(() => {
-    // Debug: Check if Pashupatinath is in the parks array
-    const pashupatinathInParks = parks.find(p => p.Park_Code === 'PAS' || (p.Name && p.Name.includes('Pashupatinath')))
-    if (pashupatinathInParks) {
-      console.log('✅ Pashupatinath found in parks array:', {
-        name: pashupatinathInParks.Name,
-        country: pashupatinathInParks.Country,
-        nepalCategory: pashupatinathInParks.NepalCategory,
-        lat: pashupatinathInParks.Latitude,
-        lon: pashupatinathInParks.Longitude
-      })
-    } else {
-      console.warn('⚠️ Pashupatinath NOT found in parks array')
-      console.log('Total parks:', parks.length)
-      const nepalParks = parks.filter(p => p.Country === 'Nepal')
-      console.log('Nepal parks count:', nepalParks.length)
-      const nepalTemples = nepalParks.filter(p => p.NepalCategory === 'Temples')
-      console.log('Nepal temples count:', nepalTemples.length)
-      if (nepalTemples.length > 0) {
-        console.log('Sample Nepal temple:', nepalTemples[0])
-      }
-    }
     
     // If all regions are explicitly set to false or undefined, return empty array
     const allRegionsHidden = Object.values(visibleRegions).every(value => value === false || value === undefined)
@@ -334,7 +483,8 @@ function MapView() {
       
       const lat = parseFloat(park.Latitude)
       const lon = parseFloat(park.Longitude)
-      if (isNaN(lat) || isNaN(lon) || lat === 0 || lon === 0) {
+      // Only filter out if both coordinates are 0 or invalid (not if just one is 0)
+      if (isNaN(lat) || isNaN(lon) || (lat === 0 && lon === 0)) {
         return false
       }
       
@@ -380,19 +530,6 @@ function MapView() {
         } else {
           // Default to Nepal-Parks for all other Nepal entries
           region = 'Nepal-Parks'
-        }
-        
-        // Debug: Log Pashupatinath specifically
-        if (park.Park_Code === 'PAS' || (park.Name && park.Name.includes('Pashupatinath'))) {
-          console.log('🔍 Pashupatinath in filteredParks:', {
-            name: park.Name,
-            country: park.Country,
-            nepalCategory: park.NepalCategory,
-            region: region,
-            lat: park.Latitude,
-            lon: park.Longitude,
-            visible: visibleRegions[region]
-          })
         }
       } else if (country === 'Sri Lanka') {
         // Use SriLankaCategory to determine sub-region
@@ -511,6 +648,17 @@ function MapView() {
       return true
     })
     .filter(park => {
+      // Check if it's most photographed
+      const description = park.Description ? String(park.Description).toLowerCase() : ''
+      const name = park.Name ? String(park.Name).toLowerCase() : ''
+      const isMostPhotographed = description.includes('most photographed') || 
+                                 description.includes('popular photography') ||
+                                 name.includes('most photographed')
+      
+      // Check if it's a national park
+      const designation = park.Designation ? String(park.Designation) : ''
+      const isNationalPark = designation.toLowerCase().includes('national park')
+      
       // Filter by attraction type
       let attractionType = null
       const country = park.Country || 'United States'
@@ -527,6 +675,7 @@ function MapView() {
       } else if (park.IndiaCategory === 'Forts') {
         attractionType = 'Forts'
       } else if (park.IndiaCategory === 'UNESCO' || park.NepalCategory === 'UNESCO' || park.SriLankaCategory === 'UNESCO' || 
+                 (park.Designation && park.Designation.toUpperCase().includes('UNESCO')) ||
                  ['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor',
                   'China', 'Japan', 'South Korea', 'North Korea', 'Mongolia',
                   'Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives',
@@ -538,19 +687,58 @@ function MapView() {
         attractionType = 'Temples'
       } else if (park.NepalCategory === 'TrekkingFlights') {
         attractionType = 'TrekkingFlights'
-      } else {
-        // Default to National Parks for US, Canada, India, Nepal, Sri Lanka, Costa Rica parks
+      } else if (isNationalPark) {
         attractionType = 'NationalParks'
+      } else {
+        // For non-national parks (waterfalls, reserves, etc.), they don't have a specific type
+        // They will be filtered by MostPhotographed filter if they are most photographed
+        // Otherwise, they should still show (default behavior)
+        attractionType = null
       }
       
-      // Check if this attraction type is visible
-      if (attractionType && !visibleAttractionTypes[attractionType]) {
-        return false
+      // Special handling for most photographed attractions:
+      // - If it's a most photographed national park: show if EITHER MostPhotographed OR NationalParks filter is on
+      // - If it's a most photographed non-national park: show only if MostPhotographed filter is on
+      if (isMostPhotographed) {
+        if (isNationalPark) {
+          // Most photographed national park: show if MostPhotographed OR NationalParks is on
+          if (!visibleAttractionTypes.MostPhotographed && !visibleAttractionTypes.NationalParks) {
+            return false
+          }
+        } else {
+          // Most photographed non-national park (waterfalls, reserves, etc.): show only if MostPhotographed is on
+          if (!visibleAttractionTypes.MostPhotographed) {
+            return false
+          }
+        }
+      } else {
+        // Not most photographed: check the regular attraction type filter
+        // If attractionType is null (non-national parks that aren't most photographed), show them by default
+        if (attractionType && !visibleAttractionTypes[attractionType]) {
+          return false
+        }
       }
       
       return true
     })
-  }, [parks, visibleRegions, visibleAttractionTypes])
+    .filter(park => {
+      // Filter by search query
+      if (!searchQuery || searchQuery.trim() === '') {
+        return true
+      }
+      
+      const query = searchQuery.toLowerCase().trim()
+      const name = (park.Name || '').toLowerCase()
+      const description = (park.Description || '').toLowerCase()
+      const country = (park.Country || '').toLowerCase()
+      const states = (park.States || '').toLowerCase()
+      
+      return name.includes(query) || 
+             description.includes(query) || 
+             country.includes(query) ||
+             states.includes(query)
+    })
+  }, [parks, visibleRegions, visibleAttractionTypes, searchQuery])
 
   // Filter airports to show only those near visible parks
   const filteredAirports = useMemo(() => {
@@ -817,6 +1005,21 @@ function MapView() {
   }
 
   const getParkIcon = (park) => {
+    // Check if it's a most photographed attraction
+    const description = park.Description ? String(park.Description).toLowerCase() : ''
+    const name = park.Name ? String(park.Name).toLowerCase() : ''
+    const isMostPhotographed = description.includes('most photographed') || 
+                               description.includes('popular photography') ||
+                               name.includes('most photographed')
+    
+    // Light red colors for most photographed attractions
+    const mostPhotographedBg = '#FFB6C1'
+    const mostPhotographedBorder = '#FF8C9F'
+    
+    // Light green colors for national parks
+    const nationalParkBg = '#90EE90' // Light green
+    const nationalParkBorder = '#7CB342' // Darker green border
+    
     // Check if it's explicitly categorized as a temple FIRST - temples should get temple icon even if they mention UNESCO
     const isNepalTemple = park.NepalCategory === 'Temples'
     const isSriLankaTemple = park.SriLankaCategory === 'Temples'
@@ -832,9 +1035,9 @@ function MapView() {
                              designationUpper.includes('UNESCO') ||
                              descriptionUpper.includes('UNESCO')
       
-      // Use temple icon (🕉️ Om) - blue background if UNESCO, saffron if not
-      const bgColor = isTempleUnesco ? '#81D4FA' : '#FF9933'
-      const borderColor = isTempleUnesco ? '#4FC3F7' : '#FF8C00'
+      // Use temple icon (🕉️ Om) - light red if most photographed, blue background if UNESCO, saffron if not
+      const bgColor = isMostPhotographed ? mostPhotographedBg : (isTempleUnesco ? '#81D4FA' : '#FF9933')
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : (isTempleUnesco ? '#4FC3F7' : '#FF8C00')
       
       return L.divIcon({
         className: 'temple-marker',
@@ -871,19 +1074,22 @@ function MapView() {
                      park.NepalCategory === 'UNESCO' ||
                      park.SriLankaCategory === 'UNESCO' ||
                      (park.Designation && park.Designation.toUpperCase().includes('UNESCO') && !isNepalTemple && !isSriLankaTemple && !isIndiaTemple) ||
-                     (park.Description && park.Description.toUpperCase().includes('UNESCO WORLD HERITAGE') && !isNepalTemple && !isSriLankaTemple && !isIndiaTemple)
+                     (park.Description && park.Description.toUpperCase().includes('UNESCO WORLD HERITAGE') && !isNepalTemple && !isSriLankaTemple && !isIndiaTemple) ||
+                     (park.Country === 'Costa Rica' && park.Designation && park.Designation.toUpperCase().includes('UNESCO'))
     
     if (isUnesco) {
-      // Use custom UNESCO icon with light blue color for all UNESCO sites
+      // Use custom UNESCO icon - light red if most photographed, light blue otherwise
+      const bgColor = isMostPhotographed ? mostPhotographedBg : '#81D4FA'
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : '#4FC3F7'
       return L.divIcon({
         className: 'unesco-marker',
         html: `<div style="
-          background-color: #81D4FA;
+          background-color: ${bgColor};
           width: 20px;
           height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 2px solid #4FC3F7;
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
@@ -916,10 +1122,10 @@ function MapView() {
                              designationUpper.includes('UNESCO') ||
                              descriptionUpper.includes('UNESCO')
       
-      // Use custom Jyotirlinga icon with trishul emoji (🔱) - blue background if UNESCO, saffron if not
+      // Use custom Jyotirlinga icon with trishul emoji (🔱) - light red if most photographed, blue background if UNESCO, saffron if not
       // Trishul is Shiva's divine weapon - a three-pronged spear
-      const bgColor = isTempleUnesco ? '#81D4FA' : '#FF9933'
-      const borderColor = isTempleUnesco ? '#4FC3F7' : '#FF8C00'
+      const bgColor = isMostPhotographed ? mostPhotographedBg : (isTempleUnesco ? '#81D4FA' : '#FF9933')
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : (isTempleUnesco ? '#4FC3F7' : '#FF8C00')
       
       return L.divIcon({
         className: 'jyotirlinga-marker',
@@ -954,16 +1160,18 @@ function MapView() {
                            (park.Designation && park.Designation.includes('Shakti Peetha'))
     
     if (isShaktiPeetha) {
-      // Use custom Shakti Peetha icon with lotus emoji (🌸) - saffron color
+      // Use custom Shakti Peetha icon with lotus emoji (🌸) - light red if most photographed, saffron otherwise
+      const bgColor = isMostPhotographed ? mostPhotographedBg : '#FF9933'
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : '#FF8C00'
       return L.divIcon({
         className: 'shakti-peetha-marker',
         html: `<div style="
-          background-color: #FF9933;
+          background-color: ${bgColor};
           width: 20px;
           height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 2px solid #FF8C00;
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1001,9 +1209,9 @@ function MapView() {
                              designationUpper.includes('UNESCO') ||
                              descriptionUpper.includes('UNESCO')
       
-      // Use custom Other Temple icon with Om emoji (🕉️) - blue background if UNESCO, saffron if not
-      const bgColor = isTempleUnesco ? '#81D4FA' : '#FF9933'
-      const borderColor = isTempleUnesco ? '#4FC3F7' : '#FF8C00'
+      // Use custom Other Temple icon with Om emoji (🕉️) - light red if most photographed, blue background if UNESCO, saffron if not
+      const bgColor = isMostPhotographed ? mostPhotographedBg : (isTempleUnesco ? '#81D4FA' : '#FF9933')
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : (isTempleUnesco ? '#4FC3F7' : '#FF8C00')
       
       return L.divIcon({
         className: 'other-temple-marker',
@@ -1038,16 +1246,18 @@ function MapView() {
                          (park.Designation && park.Designation.includes('Divya Desam'))
     
     if (isDivyaDesam) {
-      // Use custom Divya Desam icon with conch shell emoji (🐚) - saffron color
+      // Use custom Divya Desam icon with conch shell emoji (🐚) - light red if most photographed, saffron otherwise
+      const bgColor = isMostPhotographed ? mostPhotographedBg : '#FF9933'
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : '#FF8C00'
       return L.divIcon({
         className: 'divya-desam-marker',
         html: `<div style="
-          background-color: #FF9933;
+          background-color: ${bgColor};
           width: 20px;
           height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 2px solid #FF8C00;
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1072,16 +1282,18 @@ function MapView() {
                    (park.Designation && park.Designation.includes('Mutt'))
     
     if (isMath) {
-      // Use custom Math icon with monastery emoji (🏛️) - saffron color
+      // Use custom Math icon with monastery emoji (🏛️) - light red if most photographed, saffron otherwise
+      const bgColor = isMostPhotographed ? mostPhotographedBg : '#FF9933'
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : '#FF8C00'
       return L.divIcon({
         className: 'math-marker',
         html: `<div style="
-          background-color: #FF9933;
+          background-color: ${bgColor};
           width: 20px;
           height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 2px solid #FF8C00;
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1106,16 +1318,18 @@ function MapView() {
                    (park.Designation && park.Designation.includes('Fort'))
     
     if (isFort) {
-      // Use custom Fort icon with castle emoji (🏰) - brown/terracotta color
+      // Use custom Fort icon with castle emoji (🏰) - light red if most photographed, brown/terracotta otherwise
+      const bgColor = isMostPhotographed ? mostPhotographedBg : '#8B4513'
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : '#654321'
       return L.divIcon({
         className: 'fort-marker',
         html: `<div style="
-          background-color: #8B4513;
+          background-color: ${bgColor};
           width: 20px;
           height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 2px solid #654321;
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1140,16 +1354,18 @@ function MapView() {
     const isNepalTrekkingFlights = park.NepalCategory === 'TrekkingFlights'
     
     if (isNepalTrekkingFlights) {
-      // Use custom Nepal Trekking/Flights icon with mountain emoji (⛰️) - blue color
+      // Use custom Nepal Trekking/Flights icon with mountain emoji (⛰️) - light red if most photographed, blue otherwise
+      const bgColor = isMostPhotographed ? mostPhotographedBg : '#2196F3'
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : '#1976D2'
       return L.divIcon({
         className: 'nepal-trekking-flights-marker',
         html: `<div style="
-          background-color: #2196F3;
+          background-color: ${bgColor};
           width: 20px;
           height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 2px solid #1976D2;
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1169,30 +1385,88 @@ function MapView() {
       })
     }
     
-    // Regular park icons by country - use tree icon with country colors
-    const country = park.Country || 'United States'
-    let color = '#4CAF50' // Green for US
-    let borderColor = '#2E7D32' // Darker green
+    // Check if it's a national park (Designation includes "National Park")
+    const designation = park.Designation ? String(park.Designation) : ''
+    const isNationalPark = designation.toLowerCase().includes('national park')
     
-    if (country === 'Canada') {
-      color = '#F44336' // Red
-      borderColor = '#C62828' // Darker red
-    } else {
-      // All other countries (India, Nepal, Sri Lanka, Costa Rica, etc.) - pale green
-      color = '#98FB98' // Pale green
-      borderColor = '#7CB342' // Darker pale green border
+    // Regular park icons - national parks get tree emoji (🌲)
+    if (isNationalPark) {
+      // National park: tree emoji (🌲)
+      // If most photographed, use light red background, otherwise light green
+      const bgColor = isMostPhotographed ? mostPhotographedBg : nationalParkBg
+      const borderColor = isMostPhotographed ? mostPhotographedBorder : nationalParkBorder
+      
+      return L.divIcon({
+        className: 'park-marker',
+        html: `<div style="
+          background-color: ${bgColor};
+          width: 20px;
+          height: 20px;
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          border: 2px solid ${borderColor};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        ">
+          <div style="
+            transform: rotate(45deg);
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            line-height: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+          ">🌲</div>
+        </div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
+      })
     }
     
-    // Create custom tree icon with country color
+    // If it's most photographed but NOT a national park (waterfalls, reserves, etc.), use camera emoji (📷)
+    if (isMostPhotographed) {
+      return L.divIcon({
+        className: 'most-photographed-marker',
+        html: `<div style="
+          background-color: ${mostPhotographedBg};
+          width: 20px;
+          height: 20px;
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          border: 2px solid ${mostPhotographedBorder};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        ">
+          <div style="
+            transform: rotate(45deg);
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            line-height: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+          ">📷</div>
+        </div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
+      })
+    }
+    
+    // Default fallback for other attractions (non-national parks, not most photographed)
+    // Use tree emoji with light green as default
     return L.divIcon({
       className: 'park-marker',
       html: `<div style="
-        background-color: ${color};
+        background-color: ${nationalParkBg};
         width: 20px;
         height: 20px;
         border-radius: 50% 50% 50% 0;
         transform: rotate(-45deg);
-        border: 2px solid ${borderColor};
+        border: 2px solid ${nationalParkBorder};
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1262,13 +1536,39 @@ function MapView() {
     }))
   }
 
+  const handleSearch = (query) => {
+    setSearchQuery(query)
+  }
+
+  const handleSelectAttraction = (park) => {
+    const lat = parseFloat(park.Latitude)
+    const lon = parseFloat(park.Longitude)
+    
+    if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
+      // Set the park to open popup after map focuses
+      setSelectedParkForPopup(park)
+      
+      // Focus the map on the attraction
+      setMapFocus({
+        center: [lat, lon],
+        zoom: 12
+      })
+    }
+  }
+
   return (
     <div className="map-view">
+      <AttractionSearch
+        parks={parks}
+        onSearch={handleSearch}
+        onSelectAttraction={handleSelectAttraction}
+      />
       <AttractionTypeFilter
         visibleTypes={visibleAttractionTypes}
         toggleType={toggleAttractionType}
         isOpen={filterPanelOpen}
         setIsOpen={setFilterPanelOpen}
+        availableTypes={availableAttractionTypes}
       />
       <MapContainer
         center={[30.0, 0.0]}
@@ -1311,6 +1611,8 @@ function MapView() {
           center={mapFocus?.center}
           zoom={mapFocus?.zoom}
           bounds={mapFocus?.bounds}
+          selectedPark={selectedParkForPopup}
+          onPopupOpened={() => setSelectedParkForPopup(null)}
         />
         
         {/* Park Markers */}
@@ -1329,7 +1631,9 @@ function MapView() {
           const lat = parseFloat(park.Latitude)
           const lon = parseFloat(park.Longitude)
           
-          if (isNaN(lat) || isNaN(lon) || lat === 0 || lon === 0) {
+          // Fix: Allow negative longitudes (west of prime meridian)
+          // The check should only filter out invalid coordinates, not negative ones
+          if (isNaN(lat) || isNaN(lon) || (lat === 0 && lon === 0)) {
             return null
           }
           

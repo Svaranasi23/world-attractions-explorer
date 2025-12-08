@@ -15,17 +15,6 @@ export const loadCSVData = async (filename) => {
         quoteChar: '"',
         escapeChar: '"',
         complete: (results) => {
-          // Debug: Log parsing results for Nepal_Temples.csv
-          if (filename === 'Nepal_Temples.csv') {
-            const pashupatinath = results.data.find(r => r.Park_Code === 'PAS' || (r.Name && r.Name.includes('Pashupatinath')))
-            if (pashupatinath) {
-              console.log('✅ Pashupatinath found in CSV parse:', pashupatinath)
-            } else {
-              console.warn('⚠️ Pashupatinath NOT found in CSV parse results')
-              console.log('Total rows parsed:', results.data.length)
-              console.log('Sample rows:', results.data.slice(0, 3))
-            }
-          }
           resolve(results.data)
         },
         error: (error) => {
@@ -45,7 +34,7 @@ export const loadCSVData = async (filename) => {
  */
 export const loadParksData = async () => {
   try {
-    const [usParks, canadianParks, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites] = await Promise.all([
+    const [usParks, canadianParks, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, costaRicaUnescoSites, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites] = await Promise.all([
       loadCSVData('US_National_Parks.csv'),
       loadCSVData('Canadian_National_Parks.csv').catch(() => []),
       loadCSVData('Indian_National_Parks.csv').catch(() => []),
@@ -64,6 +53,7 @@ export const loadParksData = async () => {
       loadCSVData('Sri_Lanka_Temples.csv').catch(() => []),
       loadCSVData('Sri_Lanka_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Costa_Rica_National_Parks.csv').catch(() => []),
+      loadCSVData('Costa_Rica_UNESCO_Sites.csv').catch(() => []),
       // East Asia
       loadCSVData('China_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Japan_UNESCO_Sites.csv').catch(() => []),
@@ -306,22 +296,11 @@ export const loadParksData = async () => {
           })
           // If Pashupatinath exists at the same location, filter out Guhyeshwari
           if (pashupatinathAtSameLocation) {
-            console.log('🚫 Filtering out Guhyeshwari (same location as Pashupatinath)')
             return false
           }
         }
         return true
       })
-    
-    // Debug: Log Pashupatinath specifically
-    const pashupatinath = processedNepalTemples.find(t => t.Park_Code === 'PAS' || t.Name.includes('Pashupatinath'))
-    if (pashupatinath) {
-      console.log('✅ Pashupatinath Temple loaded:', pashupatinath)
-    } else {
-      console.warn('⚠️ Pashupatinath Temple NOT found in processed temples')
-      console.log('Total Nepal temples loaded:', processedNepalTemples.length)
-      console.log('Sample temple:', processedNepalTemples[0])
-    }
     
     // Process Nepal UNESCO sites
     const processedNepalUnesco = nepalUnescoSites.map(site => ({
@@ -415,6 +394,21 @@ export const loadParksData = async () => {
       URL: park.URL || '',
       Country: 'Costa Rica',
       id: `cr-${park.Park_Code || Math.random()}`
+    }))
+    
+    // Process Costa Rica UNESCO sites
+    const processedCostaRicaUnesco = costaRicaUnescoSites.map(site => ({
+      Park_Code: site.Park_Code || '',
+      Name: site.Name || '',
+      Designation: site.Designation || 'UNESCO World Heritage Site',
+      States: site.States || '',
+      Latitude: site.Latitude || '0',
+      Longitude: site.Longitude || '0',
+      Description: site.Description || `UNESCO World Heritage Site in ${site.States || ''}`,
+      URL: site.URL || '',
+      Country: 'Costa Rica',
+      UNESCO_Year: site.UNESCO_Year || '',
+      id: `cr-unesco-${site.Park_Code || Math.random()}`
     }))
     
     // Process Asian UNESCO sites
@@ -685,7 +679,7 @@ export const loadParksData = async () => {
       ...processedIndianParks, ...processedIndianUnesco, ...processedIndianJyotirlinga, ...processedIndianShaktiPeethas, ...processedIndianOtherTemples, ...processedIndianMutts, ...processedIndianDivyaDesams, ...processedIndianForts, 
       ...processedNepalParks, ...processedNepalTemples, ...processedNepalUnesco, ...processedNepalTrekkingFlights, 
       ...processedSriLankaParks, ...processedSriLankaTemples, ...processedSriLankaUnesco, 
-      ...processedCostaRicaParks, 
+      ...processedCostaRicaParks, ...processedCostaRicaUnesco, 
       // East Asia
       ...processedChinaUnesco, ...processedJapanUnesco, ...processedSouthKoreaUnesco,
       // South East Asia

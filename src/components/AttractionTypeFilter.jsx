@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import './AttractionTypeFilter.css'
 
-function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen }) {
+function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen, availableTypes }) {
   const filterRef = useRef(null)
 
   // Close filter panel when clicking outside
@@ -22,7 +22,7 @@ function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen }) {
   }, [isOpen, setIsOpen])
 
   // Attraction types with their display names and icons
-  const attractionTypes = [
+  const allAttractionTypes = [
     { key: 'NationalParks', label: 'National Parks', icon: '🏞️' },
     { key: 'UNESCO', label: 'UNESCO Sites', icon: '🏛️' },
     { key: 'Temples', label: 'Temples', icon: '🕉️' },
@@ -31,8 +31,14 @@ function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen }) {
     { key: 'Mutts', label: 'Mutts', icon: '⛩️' },
     { key: 'DivyaDesam', label: 'Divya Desam', icon: '🕉️' },
     { key: 'Forts', label: 'Forts', icon: '🏰' },
-    { key: 'TrekkingFlights', label: 'Trekking & Flights', icon: '✈️' }
+    { key: 'TrekkingFlights', label: 'Trekking & Flights', icon: '✈️' },
+    { key: 'MostPhotographed', label: 'Most Photographed', icon: '📷' }
   ]
+
+  // Filter to show only types available in the selected region
+  const attractionTypes = availableTypes 
+    ? allAttractionTypes.filter(type => availableTypes[type.key] === true)
+    : allAttractionTypes
 
   const toggleAll = () => {
     const allVisible = attractionTypes.every(type => visibleTypes[type.key])
@@ -51,7 +57,7 @@ function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen }) {
     })
   }
 
-  const allVisible = attractionTypes.every(type => visibleTypes[type.key])
+  const allVisible = attractionTypes.length > 0 && attractionTypes.every(type => visibleTypes[type.key])
   const someVisible = attractionTypes.some(type => visibleTypes[type.key])
 
   return (
@@ -80,27 +86,35 @@ function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen }) {
             </button>
           </div>
           
-          <div className="filter-actions">
-            <button
-              className="toggle-all-button"
-              onClick={toggleAll}
-            >
-              {allVisible ? 'Deselect All' : 'Select All'}
-            </button>
-          </div>
+          {attractionTypes.length > 0 && (
+            <div className="filter-actions">
+              <button
+                className="toggle-all-button"
+                onClick={toggleAll}
+              >
+                {allVisible ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
+          )}
 
           <div className="filter-type-list">
-            {attractionTypes.map(type => (
-              <label key={type.key} className="filter-type-item">
-                <input
-                  type="checkbox"
-                  checked={visibleTypes[type.key] || false}
-                  onChange={() => toggleType(type.key)}
-                />
-                <span className="filter-type-icon">{type.icon}</span>
-                <span className="filter-type-label">{type.label}</span>
-              </label>
-            ))}
+            {attractionTypes.length === 0 ? (
+              <div className="filter-empty-message">
+                No attraction types available in the selected region.
+              </div>
+            ) : (
+              attractionTypes.map(type => (
+                <label key={type.key} className="filter-type-item">
+                  <input
+                    type="checkbox"
+                    checked={visibleTypes[type.key] || false}
+                    onChange={() => toggleType(type.key)}
+                  />
+                  <span className="filter-type-icon">{type.icon}</span>
+                  <span className="filter-type-label">{type.label}</span>
+                </label>
+              ))
+            )}
           </div>
         </div>
       )}

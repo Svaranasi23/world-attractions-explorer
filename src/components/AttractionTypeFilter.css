@@ -205,6 +205,14 @@ body.menu-open .filter-icon-button {
   font-weight: 500;
 }
 
+.filter-empty-message {
+  padding: 24px 20px;
+  text-align: center;
+  color: #605e5c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
   .filter-icon-button {

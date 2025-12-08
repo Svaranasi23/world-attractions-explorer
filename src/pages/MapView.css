@@ -160,4 +160,38 @@
   }
 }
 
+/* Ensure Leaflet popups and markers appear above UI controls */
+.leaflet-popup-pane {
+  z-index: 1010 !important;
+}
+
+.leaflet-popup {
+  z-index: 1010 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  z-index: 1010 !important;
+}
+
+.leaflet-popup-tip {
+  z-index: 1010 !important;
+}
+
+.leaflet-marker-pane {
+  z-index: 1005 !important;
+}
+
+.leaflet-marker-icon {
+  z-index: 1005 !important;
+}
+
+/* Ensure tooltips appear above UI controls */
+.leaflet-tooltip-pane {
+  z-index: 1008 !important;
+}
+
+.leaflet-tooltip {
+  z-index: 1008 !important;
+}
+
 
