@@ -6,6 +6,7 @@ import 'leaflet.heat'
 import { loadParksData, loadAirportsData, findNearbyAirports, findNearbyParks, categorizeParksByRegion, calculateDistance } from '../services/dataService'
 import TabPanel from '../components/TabPanel'
 import MapController from '../components/MapController'
+import AttractionTypeFilter from '../components/AttractionTypeFilter'
 import './MapView.css'
 
 // Fix for default marker icons in React Leaflet
@@ -203,9 +204,21 @@ function MapView() {
   })
   const [showHeatMap, setShowHeatMap] = useState(false)
   const [showAirports, setShowAirports] = useState(false)
-  const [activeTab, setActiveTab] = useState('filters')
+  const [activeTab, setActiveTab] = useState('stats')
   const [mapFocus, setMapFocus] = useState(null)
   const mapRef = useRef(null)
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false)
+  const [visibleAttractionTypes, setVisibleAttractionTypes] = useState({
+    NationalParks: true,
+    UNESCO: true,
+    Temples: true,
+    Jyotirlinga: true,
+    ShaktiPeetha: true,
+    Mutts: true,
+    DivyaDesam: true,
+    Forts: true,
+    TrekkingFlights: true
+  })
 
   useEffect(() => {
     const loadData = async () => {
@@ -497,7 +510,47 @@ function MapView() {
       }
       return true
     })
-  }, [parks, visibleRegions])
+    .filter(park => {
+      // Filter by attraction type
+      let attractionType = null
+      const country = park.Country || 'United States'
+      
+      // Determine attraction type
+      if (park.IndiaCategory === 'Jyotirlinga') {
+        attractionType = 'Jyotirlinga'
+      } else if (park.IndiaCategory === 'ShaktiPeetha') {
+        attractionType = 'ShaktiPeetha'
+      } else if (park.IndiaCategory === 'Mutts') {
+        attractionType = 'Mutts'
+      } else if (park.IndiaCategory === 'DivyaDesam') {
+        attractionType = 'DivyaDesam'
+      } else if (park.IndiaCategory === 'Forts') {
+        attractionType = 'Forts'
+      } else if (park.IndiaCategory === 'UNESCO' || park.NepalCategory === 'UNESCO' || park.SriLankaCategory === 'UNESCO' || 
+                 ['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor',
+                  'China', 'Japan', 'South Korea', 'North Korea', 'Mongolia',
+                  'Bangladesh', 'Pakistan', 'Afghanistan', 'Bhutan', 'Maldives',
+                  'Kazakhstan', 'Kyrgyzstan', 'Tajikistan', 'Turkmenistan', 'Uzbekistan',
+                  'Iran', 'Iraq', 'Jordan', 'Lebanon', 'Saudi Arabia', 'Syria', 'Turkey', 'UAE', 'United Arab Emirates', 'Yemen', 'Oman', 'Qatar', 'Kuwait', 'Bahrain', 'Israel', 'Palestine',
+                  'Belize', 'Guatemala', 'Honduras', 'El Salvador', 'Nicaragua', 'Panama', 'Mexico'].includes(country)) {
+        attractionType = 'UNESCO'
+      } else if (park.IndiaCategory === 'OtherTemples' || park.NepalCategory === 'Temples' || park.SriLankaCategory === 'Temples') {
+        attractionType = 'Temples'
+      } else if (park.NepalCategory === 'TrekkingFlights') {
+        attractionType = 'TrekkingFlights'
+      } else {
+        // Default to National Parks for US, Canada, India, Nepal, Sri Lanka, Costa Rica parks
+        attractionType = 'NationalParks'
+      }
+      
+      // Check if this attraction type is visible
+      if (attractionType && !visibleAttractionTypes[attractionType]) {
+        return false
+      }
+      
+      return true
+    })
+  }, [parks, visibleRegions, visibleAttractionTypes])
 
   // Filter airports to show only those near visible parks
   const filteredAirports = useMemo(() => {
@@ -650,7 +703,10 @@ function MapView() {
   }
 
   const handleRegionFocus = (regionName) => {
-    if (regionName === 'United States') {
+    if (regionName === 'World') {
+      // Focus on world view (default center and zoom)
+      setMapFocus({ center: [30.0, 0.0], zoom: 2, bounds: null })
+    } else if (regionName === 'United States') {
       // Focus on US (center of continental US)
       setMapFocus({ center: [39.8283, -98.5795], zoom: 4, bounds: null })
     } else if (regionName === 'India') {
@@ -674,6 +730,15 @@ function MapView() {
       return {
         ...prev,
         [region]: newValue
+      }
+    })
+  }
+
+  const setRegionVisibility = (regionUpdates) => {
+    setVisibleRegions(prev => {
+      return {
+        ...prev,
+        ...regionUpdates
       }
     })
   }
@@ -775,28 +840,28 @@ function MapView() {
         className: 'temple-marker',
         html: `<div style="
           background-color: ${bgColor};
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid ${borderColor};
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         ">
           <div style="
             transform: rotate(45deg);
             color: white;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 11px;
             line-height: 1;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
           ">🕉️</div>
         </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
       })
     }
     
@@ -814,28 +879,28 @@ function MapView() {
         className: 'unesco-marker',
         html: `<div style="
           background-color: #81D4FA;
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #4FC3F7;
+          border: 2px solid #4FC3F7;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         ">
           <div style="
             transform: rotate(45deg);
             color: white;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 11px;
             line-height: 1;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
           ">🏛️</div>
         </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
       })
     }
     
@@ -860,27 +925,27 @@ function MapView() {
         className: 'jyotirlinga-marker',
         html: `<div style="
           background-color: ${bgColor};
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid ${borderColor};
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         ">
           <div style="
             transform: rotate(45deg);
             color: white;
-            font-size: 18px;
+            font-size: 12px;
             line-height: 1;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
           ">🔱</div>
         </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
       })
     }
     
@@ -894,27 +959,27 @@ function MapView() {
         className: 'shakti-peetha-marker',
         html: `<div style="
           background-color: #FF9933;
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #FF8C00;
+          border: 2px solid #FF8C00;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         ">
           <div style="
             transform: rotate(45deg);
             color: white;
-            font-size: 18px;
+            font-size: 12px;
             line-height: 1;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
           ">🌸</div>
         </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
       })
     }
     
@@ -944,27 +1009,27 @@ function MapView() {
         className: 'other-temple-marker',
         html: `<div style="
           background-color: ${bgColor};
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid ${borderColor};
+          border: 2px solid ${borderColor};
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         ">
           <div style="
             transform: rotate(45deg);
             color: white;
-            font-size: 18px;
+            font-size: 12px;
             line-height: 1;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
           ">🕉️</div>
         </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
       })
     }
     
@@ -978,27 +1043,27 @@ function MapView() {
         className: 'divya-desam-marker',
         html: `<div style="
           background-color: #FF9933;
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #FF8C00;
+          border: 2px solid #FF8C00;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         ">
           <div style="
             transform: rotate(45deg);
             color: white;
-            font-size: 18px;
+            font-size: 12px;
             line-height: 1;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
           ">🐚</div>
         </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
       })
     }
     
@@ -1012,27 +1077,27 @@ function MapView() {
         className: 'math-marker',
         html: `<div style="
           background-color: #FF9933;
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #FF8C00;
+          border: 2px solid #FF8C00;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         ">
           <div style="
             transform: rotate(45deg);
             color: white;
-            font-size: 18px;
+            font-size: 12px;
             line-height: 1;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
           ">🏛️</div>
         </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
       })
     }
     
@@ -1046,27 +1111,27 @@ function MapView() {
         className: 'fort-marker',
         html: `<div style="
           background-color: #8B4513;
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #654321;
+          border: 2px solid #654321;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         ">
           <div style="
             transform: rotate(45deg);
             color: white;
-            font-size: 18px;
+            font-size: 12px;
             line-height: 1;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
           ">🏰</div>
         </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
       })
     }
     
@@ -1080,27 +1145,27 @@ function MapView() {
         className: 'nepal-trekking-flights-marker',
         html: `<div style="
           background-color: #2196F3;
-          width: 30px;
-          height: 30px;
+          width: 20px;
+          height: 20px;
           border-radius: 50% 50% 50% 0;
           transform: rotate(-45deg);
-          border: 3px solid #1976D2;
+          border: 2px solid #1976D2;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         ">
           <div style="
             transform: rotate(45deg);
             color: white;
-            font-size: 18px;
+            font-size: 12px;
             line-height: 1;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
           ">⛰️</div>
         </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30]
+        iconSize: [20, 20],
+        iconAnchor: [10, 20],
+        popupAnchor: [0, -20]
       })
     }
     
@@ -1123,28 +1188,28 @@ function MapView() {
       className: 'park-marker',
       html: `<div style="
         background-color: ${color};
-        width: 30px;
-        height: 30px;
+        width: 20px;
+        height: 20px;
         border-radius: 50% 50% 50% 0;
         transform: rotate(-45deg);
-        border: 3px solid ${borderColor};
+        border: 2px solid ${borderColor};
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
       ">
         <div style="
           transform: rotate(45deg);
           color: white;
           font-weight: bold;
-          font-size: 16px;
+          font-size: 11px;
           line-height: 1;
           text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         ">🌲</div>
       </div>`,
-      iconSize: [30, 30],
-      iconAnchor: [15, 30],
-      popupAnchor: [0, -30]
+      iconSize: [20, 20],
+      iconAnchor: [10, 20],
+      popupAnchor: [0, -20]
     })
   }
 
@@ -1158,26 +1223,26 @@ function MapView() {
       className: 'airport-marker',
       html: `<div style="
         background-color: ${color};
-        width: 32px;
-        height: 32px;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
-        border: 3px solid ${borderColor};
+        border: 2px solid ${borderColor};
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.4);
         transform: rotate(0deg);
       ">
         <div style="
           color: #333333;
-          font-size: 18px;
+          font-size: 12px;
           line-height: 1;
           transform: rotate(0deg);
         ">✈️</div>
       </div>`,
-      iconSize: [32, 32],
-      iconAnchor: [16, 16],
-      popupAnchor: [0, -16]
+      iconSize: [22, 22],
+      iconAnchor: [11, 11],
+      popupAnchor: [0, -11]
     })
   }
 
@@ -1190,8 +1255,21 @@ function MapView() {
     )
   }
 
+  const toggleAttractionType = (type) => {
+    setVisibleAttractionTypes(prev => ({
+      ...prev,
+      [type]: !prev[type]
+    }))
+  }
+
   return (
     <div className="map-view">
+      <AttractionTypeFilter
+        visibleTypes={visibleAttractionTypes}
+        toggleType={toggleAttractionType}
+        isOpen={filterPanelOpen}
+        setIsOpen={setFilterPanelOpen}
+      />
       <MapContainer
         center={[30.0, 0.0]}
         zoom={2}
@@ -1533,18 +1611,10 @@ function MapView() {
         regions={regions}
         visibleRegions={visibleRegions}
         toggleRegion={toggleRegion}
-        toggleAllUSRegions={toggleAllUSRegions}
-        areAllUSRegionsVisible={areAllUSRegionsVisible}
+        setRegionVisibility={setRegionVisibility}
+        handleRegionFocus={handleRegionFocus}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        showAirports={showAirports}
-        setShowAirports={setShowAirports}
-        toggleAllIndiaRegions={toggleAllIndiaRegions}
-        areAllIndiaRegionsVisible={areAllIndiaRegionsVisible}
-        toggleAllNepalRegions={toggleAllNepalRegions}
-        areAllNepalRegionsVisible={areAllNepalRegionsVisible}
-        toggleAllSriLankaRegions={toggleAllSriLankaRegions}
-        areAllSriLankaRegionsVisible={areAllSriLankaRegionsVisible}
       />
     </div>
   )
