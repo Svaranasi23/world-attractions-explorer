@@ -1,2 +1,5 @@
 Park_Code,Name,Designation,States,Latitude,Longitude,Description,URL,Country,UNESCO_Year
-
+MY_GUNUNG,Gunung Mulu National Park,UNESCO World Heritage Site (Natural),Sarawak,4.1333,114.9167,"Gunung Mulu National Park - UNESCO World Heritage Site. Spectacular karst landscape with extensive cave systems and biodiversity.",https://whc.unesco.org/en/list/1013,Malaysia,2000
+MY_KINABALU,Kinabalu Park,UNESCO World Heritage Site (Natural),Sabah,6.0833,116.5500,"Kinabalu Park - UNESCO World Heritage Site. Home to Mount Kinabalu, Southeast Asia's highest peak, with diverse flora and fauna.",https://whc.unesco.org/en/list/1012,Malaysia,2000
+MY_MELAKA,Melaka and George Town, Historic Cities of the Straits of Malacca,UNESCO World Heritage Site (Cultural),"Melaka, Penang",2.1944,102.2492,"Melaka and George Town - UNESCO World Heritage Site. Historic trading cities with multicultural heritage and colonial architecture.",https://whc.unesco.org/en/list/1223,Malaysia,2008
+MY_LENGGONG,Archaeological Heritage of the Lenggong Valley,UNESCO World Heritage Site (Cultural),Perak,5.0833,100.9667,"Archaeological Heritage of the Lenggong Valley - UNESCO World Heritage Site. Prehistoric archaeological sites with evidence of early human habitation.",https://whc.unesco.org/en/list/1396,Malaysia,2012

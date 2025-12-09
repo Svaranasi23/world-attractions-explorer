@@ -34,7 +34,7 @@ export const loadCSVData = async (filename) => {
  */
 export const loadParksData = async () => {
   try {
-    const [usParks, usMostPhotographed, canadianParks, canadianMostPhotographed, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, costaRicaUnescoSites, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites, usUnescoSites, canadaUnescoSites, asiaMostPhotographed] = await Promise.all([
+    const [usParks, usMostPhotographed, canadianParks, canadianMostPhotographed, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, costaRicaUnescoSites, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, northKoreaUnescoSites, mongoliaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites, usUnescoSites, canadaUnescoSites, asiaMostPhotographed] = await Promise.all([
       loadCSVData('US_National_Parks.csv'),
       loadCSVData('US_Most_Photographed_Places.csv').catch(() => []),
       loadCSVData('Canadian_National_Parks.csv').catch(() => []),
@@ -60,6 +60,8 @@ export const loadParksData = async () => {
       loadCSVData('China_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Japan_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('South_Korea_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('North_Korea_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Mongolia_UNESCO_Sites.csv').catch(() => []),
       // South East Asia
       loadCSVData('Thailand_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Indonesia_UNESCO_Sites.csv').catch(() => []),
@@ -596,6 +598,8 @@ export const loadParksData = async () => {
     
     // Process remaining South East Asian UNESCO sites
     const processedSouthKoreaUnesco = processUnescoSites(southKoreaUnescoSites, 'South Korea', 'kr')
+    const processedNorthKoreaUnesco = processUnescoSites(northKoreaUnescoSites, 'North Korea', 'kp')
+    const processedMongoliaUnesco = processUnescoSites(mongoliaUnescoSites, 'Mongolia', 'mn')
     const processedPhilippinesUnesco = processUnescoSites(philippinesUnescoSites, 'Philippines', 'ph')
     const processedMalaysiaUnesco = processUnescoSites(malaysiaUnescoSites, 'Malaysia', 'my')
     const processedSingaporeUnesco = processUnescoSites(singaporeUnescoSites, 'Singapore', 'sg')
