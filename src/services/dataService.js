@@ -34,7 +34,7 @@ export const loadCSVData = async (filename) => {
  */
 export const loadParksData = async () => {
   try {
-    const [usParks, usMostPhotographed, canadianParks, canadianMostPhotographed, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, costaRicaUnescoSites, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites] = await Promise.all([
+    const [usParks, usMostPhotographed, canadianParks, canadianMostPhotographed, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, costaRicaUnescoSites, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites, usUnescoSites, canadaUnescoSites] = await Promise.all([
       loadCSVData('US_National_Parks.csv'),
       loadCSVData('US_Most_Photographed_Places.csv').catch(() => []),
       loadCSVData('Canadian_National_Parks.csv').catch(() => []),
@@ -107,7 +107,10 @@ export const loadParksData = async () => {
       loadCSVData('El_Salvador_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Nicaragua_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Panama_UNESCO_Sites.csv').catch(() => []),
-      loadCSVData('Mexico_UNESCO_Sites.csv').catch(() => [])
+      loadCSVData('Mexico_UNESCO_Sites.csv').catch(() => []),
+      // North America
+      loadCSVData('US_UNESCO_Sites.csv').catch(() => []),
+      loadCSVData('Canada_UNESCO_Sites.csv').catch(() => [])
     ])
     
     // Process US parks
@@ -630,6 +633,10 @@ export const loadParksData = async () => {
     const processedPanamaUnesco = processUnescoSites(panamaUnescoSites, 'Panama', 'pa')
     const processedMexicoUnesco = processUnescoSites(mexicoUnescoSites, 'Mexico', 'mx')
     
+    // Process North American UNESCO sites
+    const processedUSUnesco = processUnescoSites(usUnescoSites, 'United States', 'us')
+    const processedCanadaUnesco = processUnescoSites(canadaUnescoSites, 'Canada', 'ca')
+    
     // Process Indian Mutts
     const processedIndianMutts = indianMutts
       .filter(mutt => {
@@ -719,7 +726,9 @@ export const loadParksData = async () => {
       // West Asia / Middle East
       ...processedIranUnesco, ...processedIraqUnesco, ...processedJordanUnesco, ...processedLebanonUnesco, ...processedSaudiArabiaUnesco, ...processedSyriaUnesco, ...processedTurkeyUnesco, ...processedUaeUnesco, ...processedYemenUnesco, ...processedOmanUnesco, ...processedQatarUnesco, ...processedKuwaitUnesco, ...processedBahrainUnesco, ...processedIsraelUnesco, ...processedPalestineUnesco,
       // Central America
-      ...processedBelizeUnesco, ...processedGuatemalaUnesco, ...processedHondurasUnesco, ...processedElSalvadorUnesco, ...processedNicaraguaUnesco, ...processedPanamaUnesco, ...processedMexicoUnesco
+      ...processedBelizeUnesco, ...processedGuatemalaUnesco, ...processedHondurasUnesco, ...processedElSalvadorUnesco, ...processedNicaraguaUnesco, ...processedPanamaUnesco, ...processedMexicoUnesco,
+      // North America
+      ...processedUSUnesco, ...processedCanadaUnesco
     ]
   } catch (error) {
     console.error('Error loading parks data:', error)
