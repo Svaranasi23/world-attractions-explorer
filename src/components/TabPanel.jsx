@@ -171,14 +171,6 @@ function TabPanel({ activeTab, setActiveTab, parks, regions, visibleRegions, tog
       setRegionVisibility(newVisibleRegions)
     }
   }
-  
-  // Helper function to check if a country has data
-  const hasCountryData = (country) => {
-    const parks = regions[Object.keys(regions).find(key => 
-      key.includes('UNESCO') || key === 'India-Parks' || key === 'Nepal-Parks' || key === 'Sri Lanka-Parks'
-    )] || []
-    return parks.some(park => park.Country === country)
-  }
 
   // Close menu when clicking outside
   useEffect(() => {
