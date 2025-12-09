@@ -185,13 +185,34 @@
   z-index: 1005 !important;
 }
 
-/* Ensure tooltips appear above UI controls */
+/* Ensure map container doesn't create stacking context that traps tooltips */
+.leaflet-container {
+  z-index: 1 !important;
+  position: relative !important;
+}
+
+/* Ensure tooltips appear above UI controls (search bar is 500, menu is 500, filter is 501) */
 .leaflet-tooltip-pane {
   z-index: 1008 !important;
+  position: relative !important;
 }
 
 .leaflet-tooltip {
   z-index: 1008 !important;
+  position: absolute !important;
+  pointer-events: none !important;
 }
+
+
+/* Ensure tooltip arrows are also above */
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+  z-index: 1008 !important;
+  pointer-events: none !important;
+}
+
+
 
 

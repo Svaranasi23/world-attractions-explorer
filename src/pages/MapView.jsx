@@ -9,6 +9,8 @@ import MapController from '../components/MapController'
 import AttractionTypeFilter from '../components/AttractionTypeFilter'
 import AttractionSearch from '../components/AttractionSearch'
 import MapLegend from '../components/MapLegend'
+import TooltipZIndexFix from '../components/TooltipZIndexFix'
+import PopupPositionRestore from '../components/PopupPositionRestore'
 import './MapView.css'
 
 // Fix for default marker icons in React Leaflet
@@ -1616,6 +1618,8 @@ function MapView() {
           selectedPark={selectedParkForPopup}
           onPopupOpened={() => setSelectedParkForPopup(null)}
         />
+        <TooltipZIndexFix />
+        <PopupPositionRestore />
         
         {/* Park Markers */}
         {filteredParks.map((park, index) => {
@@ -1727,8 +1731,9 @@ function MapView() {
               key={park.id || index}
               position={[lat, lon]}
               icon={getParkIcon(park)}
+              title=""
             >
-              <Popup>
+              <Popup autoPan={true} autoPanPadding={[100, 50]}>
                 <div className="park-popup">
                   <h3>{park.Name}</h3>
                   <p><strong>🌍 Country:</strong> {country}</p>
@@ -1873,8 +1878,9 @@ function MapView() {
               key={`airport-${airport.IATA || index}`}
               position={[lat, lon]}
               icon={getAirportIcon(airport)}
+              title=""
             >
-              <Popup>
+              <Popup autoPan={true} autoPanPadding={[100, 50]}>
                 <div className="airport-popup">
                   <h3>✈️ {airport.Name || 'Airport'}</h3>
                   {airport.IATA && (

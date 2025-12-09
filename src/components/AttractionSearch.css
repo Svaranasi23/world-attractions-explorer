@@ -6,7 +6,7 @@
   width: calc(100% - 140px); /* Account for menu (48px) + filter (48px) + margins (44px) */
   max-width: 400px;
   min-width: 200px;
-  z-index: 1001;
+  z-index: 500; /* Lower than tooltips (1008) */
 }
 
 .attraction-search-input-wrapper {
