@@ -132,10 +132,10 @@
 /* Mobile responsive */
 @media (max-width: 768px) {
   .attraction-search-container {
-    top: 70px; /* Below hamburger menu (48px + 15px top + 7px gap) */
-    left: 10px;
-    right: 70px; /* Leave space for filter icon (48px + 10px margin + 12px gap) */
-    width: calc(100% - 80px);
+    top: 12px; /* Align with hamburger and filter icons */
+    left: 64px; /* Menu icon (12px + 44px) + 8px gap */
+    right: 64px; /* Filter icon (12px + 44px) + 8px gap */
+    width: auto; /* Use left/right to define width */
     max-width: none;
     min-width: auto;
     transform: none;
@@ -184,10 +184,10 @@
 /* Small mobile devices */
 @media (max-width: 480px) {
   .attraction-search-container {
-    top: 68px; /* Below hamburger menu */
-    left: 8px;
-    right: 66px; /* Leave space for filter icon */
-    width: calc(100% - 74px);
+    top: 12px; /* Align with hamburger icon */
+    left: 64px; /* Menu icon (12px + 44px) + 8px gap */
+    right: 58px; /* Filter icon (10px + 40px) + 8px gap */
+    width: auto; /* Use left/right to define width */
   }
 
   .attraction-search-input-wrapper {
@@ -233,9 +233,10 @@
 /* Very small mobile devices */
 @media (max-width: 360px) {
   .attraction-search-container {
-    left: 6px;
-    right: 64px; /* Leave space for filter icon */
-    width: calc(100% - 70px);
+    top: 12px; /* Align with hamburger icon */
+    left: 62px; /* Menu icon (12px + 44px) + 6px gap */
+    right: 56px; /* Filter icon (10px + 40px) + 6px gap */
+    width: auto; /* Use left/right to define width */
   }
 
   .attraction-search-input {
