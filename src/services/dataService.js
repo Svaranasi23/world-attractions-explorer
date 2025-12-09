@@ -728,7 +728,7 @@ export const loadParksData = async () => {
       ...processedSriLankaParks, ...processedSriLankaTemples, ...processedSriLankaUnesco, 
       ...processedCostaRicaParks, ...processedCostaRicaUnesco, 
       // East Asia
-      ...processedChinaUnesco, ...processedJapanUnesco, ...processedSouthKoreaUnesco,
+      ...processedChinaUnesco, ...processedJapanUnesco, ...processedSouthKoreaUnesco, ...processedNorthKoreaUnesco, ...processedMongoliaUnesco,
       // South East Asia
       ...processedThailandUnesco, ...processedIndonesiaUnesco, ...processedVietnamUnesco, ...processedCambodiaUnesco, ...processedMyanmarUnesco, ...processedPhilippinesUnesco, ...processedMalaysiaUnesco, ...processedSingaporeUnesco, ...processedLaosUnesco, ...processedBruneiUnesco, ...processedEastTimorUnesco,
       // South Asia
