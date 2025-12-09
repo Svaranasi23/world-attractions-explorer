@@ -116,18 +116,30 @@ export const loadParksData = async () => {
     }))
     
     // Process Canadian parks
-    const processedCanadianParks = canadianParks.map(park => ({
-      Park_Code: park.Park_Code || '',
-      Name: park.Name || '',
-      Designation: 'National Park',
-      States: park.Province || '',
-      Latitude: park.Latitude || '0',
-      Longitude: park.Longitude || '0',
-      Description: `Canadian National Park in ${park.Province || ''}`,
-      URL: '',
-      Country: 'Canada',
-      id: `ca-${park.Park_Code || Math.random()}`
-    }))
+    const processedCanadianParks = canadianParks.map(park => {
+      // Create description with special handling for most photographed parks
+      let description = `Canadian National Park in ${park.Province || ''}`
+      
+      // Add most photographed designation for popular parks
+      if (park.Park_Code === 'banff') {
+        description = `Banff National Park in ${park.Province || ''}. Canada's first national park, featuring stunning mountain landscapes, turquoise lakes like Lake Louise and Moraine Lake, and world-class hiking. One of the most photographed places in Canada and the world.`
+      } else if (park.Park_Code === 'jasper') {
+        description = `Jasper National Park in ${park.Province || ''}. The largest national park in the Canadian Rockies, known for its pristine wilderness, glaciers, and abundant wildlife. With iconic locations like Maligne Lake and the Columbia Icefield, it's one of the most photographed national parks in Canada.`
+      }
+      
+      return {
+        Park_Code: park.Park_Code || '',
+        Name: park.Name || '',
+        Designation: 'National Park',
+        States: park.Province || '',
+        Latitude: park.Latitude || '0',
+        Longitude: park.Longitude || '0',
+        Description: description,
+        URL: '',
+        Country: 'Canada',
+        id: `ca-${park.Park_Code || Math.random()}`
+      }
+    })
     
     // Process Indian parks
     const processedIndianParks = indianParks.map(park => ({
