@@ -34,10 +34,11 @@ export const loadCSVData = async (filename) => {
  */
 export const loadParksData = async () => {
   try {
-    const [usParks, usMostPhotographed, canadianParks, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, costaRicaUnescoSites, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites] = await Promise.all([
+    const [usParks, usMostPhotographed, canadianParks, canadianMostPhotographed, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMutts, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, costaRicaUnescoSites, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites] = await Promise.all([
       loadCSVData('US_National_Parks.csv'),
       loadCSVData('US_Most_Photographed_Places.csv').catch(() => []),
       loadCSVData('Canadian_National_Parks.csv').catch(() => []),
+      loadCSVData('Canada_Most_Photographed_Places.csv').catch(() => []),
       loadCSVData('Indian_National_Parks.csv').catch(() => []),
       loadCSVData('India_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('India_Jyotirlinga_Temples.csv').catch(() => []),
@@ -148,6 +149,13 @@ export const loadParksData = async () => {
         id: `ca-${park.Park_Code || Math.random()}`
       }
     })
+    
+    // Process Canadian most photographed places
+    const processedCanadianMostPhotographed = canadianMostPhotographed.map(place => ({
+      ...place,
+      Country: 'Canada',
+      id: `ca-mp-${place.Park_Code || Math.random()}`
+    }))
     
     // Process Indian parks
     const processedIndianParks = indianParks.map(park => ({
@@ -695,7 +703,7 @@ export const loadParksData = async () => {
       }))
     
     return [
-      ...processedUSParks, ...processedUSMostPhotographed, ...processedCanadianParks, 
+      ...processedUSParks, ...processedUSMostPhotographed, ...processedCanadianParks, ...processedCanadianMostPhotographed, 
       ...processedIndianParks, ...processedIndianUnesco, ...processedIndianJyotirlinga, ...processedIndianShaktiPeethas, ...processedIndianOtherTemples, ...processedIndianMutts, ...processedIndianDivyaDesams, ...processedIndianForts, 
       ...processedNepalParks, ...processedNepalTemples, ...processedNepalUnesco, ...processedNepalTrekkingFlights, 
       ...processedSriLankaParks, ...processedSriLankaTemples, ...processedSriLankaUnesco, 
