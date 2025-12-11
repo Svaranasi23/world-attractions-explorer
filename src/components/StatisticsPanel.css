@@ -2,6 +2,10 @@
   width: 100%;
   font-size: 13px;
   background: #faf9f8;
+  position: relative;
+  z-index: 1;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 .statistics-panel h3 {

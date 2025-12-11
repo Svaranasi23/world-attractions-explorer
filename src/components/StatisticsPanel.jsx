@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { getVisitedCount, isPlaceVisited, loadVisitedPlaces } from '../services/visitedPlacesService'
 import './StatisticsPanel.css'
 import './FilterPanel.css'
 
@@ -106,7 +107,7 @@ function InfoTooltip({ countries }) {
   )
 }
 
-function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
+function StatisticsPanel({ parks, regions, activeTab, setActiveTab, visitedPlaces }) {
   const [expandedCountries, setExpandedCountries] = useState({})
   const [americasExpanded, setAmericasExpanded] = useState(true)
   const [northernAmericaExpanded, setNorthernAmericaExpanded] = useState(false)
@@ -235,8 +236,47 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
 
-    return { topStates, topProvinces, topIndiaStates, topNepalStates, topSriLankaStates, topCostaRicaStates, topSoutheastAsiaCountries, topEastAsiaCountries, topSouthAsiaCountries, topCentralAsiaCountries, topWestAsiaCountries, topCentralAmericaCountries, countryCounts }
-  }, [parks])
+    // Safely calculate visited statistics
+    let visitedCount = 0
+    let visitedPercentage = '0'
+    try {
+      if (visitedPlaces && typeof visitedPlaces === 'object' && parks && Array.isArray(parks) && parks.length > 0) {
+        // Use the visitedPlaces passed as prop, or load from localStorage
+        const placesToCheck = visitedPlaces || loadVisitedPlaces()
+        visitedCount = parks.filter(park => {
+          try {
+            return isPlaceVisited(park, placesToCheck)
+          } catch (e) {
+            return false
+          }
+        }).length
+        const percentage = (visitedCount / parks.length) * 100
+        visitedPercentage = isNaN(percentage) ? '0' : percentage.toFixed(1)
+      }
+    } catch (error) {
+      console.error('Error calculating visited statistics:', error)
+      visitedCount = 0
+      visitedPercentage = '0'
+    }
+
+    return { 
+      topStates, 
+      topProvinces, 
+      topIndiaStates, 
+      topNepalStates, 
+      topSriLankaStates, 
+      topCostaRicaStates, 
+      topSoutheastAsiaCountries, 
+      topEastAsiaCountries, 
+      topSouthAsiaCountries, 
+      topCentralAsiaCountries, 
+      topWestAsiaCountries, 
+      topCentralAmericaCountries, 
+      countryCounts,
+      visitedCount,
+      visitedPercentage
+    }
+  }, [parks, visitedPlaces])
 
   const totalIndiaAttractions = (regions['India-Parks']?.length || 0) + 
                                  (regions['India-UNESCO']?.length || 0) + 
@@ -264,10 +304,35 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab }) {
   const totalWesternAsia = (regions['WestAsia-UNESCO']?.length || 0)
   const totalAsia = totalSouthernAsia + totalSoutheastAsia + totalEasternAsia + totalCentralAsia + totalWesternAsia
 
+  // Safety check - ensure stats exists
+  if (!stats) {
+    return (
+      <div className="statistics-panel">
+        <h3>📊 Statistics</h3>
+        <p>Loading statistics...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="statistics-panel">
       <h3>📊 Statistics</h3>
-      <p><strong>Total Attractions:</strong> {parks.length}</p>
+      <p><strong>Total Attractions:</strong> {parks.length || 0}</p>
+      {visitedPlaces && typeof visitedPlaces === 'object' && Object.keys(visitedPlaces).length > 0 && stats.visitedCount > 0 && (
+        <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#e8f5e9', borderRadius: '6px', border: '1px solid #4CAF50' }}>
+          <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: '#2e7d32' }}>
+            <span>✓</span> Visited: {stats.visitedCount || 0} / {parks.length || 0} ({stats.visitedPercentage || '0'}%)
+          </p>
+          <div style={{ width: '100%', height: '8px', backgroundColor: '#c8e6c9', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{ 
+              width: `${Math.min(100, Math.max(0, parseFloat(stats.visitedPercentage) || 0))}%`, 
+              height: '100%', 
+              backgroundColor: '#4CAF50',
+              transition: 'width 0.3s ease'
+            }}></div>
+          </div>
+        </div>
+      )}
 
       <div className="country-summary">
         {/* Americas (UN Geoscheme) */}

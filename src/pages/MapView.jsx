@@ -4,6 +4,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet.heat'
 import { loadParksData, loadAirportsData, findNearbyAirports, findNearbyParks, categorizeParksByRegion, calculateDistance } from '../services/dataService'
+import { loadVisitedPlaces, markAsVisited, markAsNotVisited, isPlaceVisited, getVisitedCount, loadUserProfile, saveUserProfile } from '../services/visitedPlacesService'
 import TabPanel from '../components/TabPanel'
 import MapController from '../components/MapController'
 import MapViewTracker from '../components/MapViewTracker'
@@ -217,6 +218,10 @@ function MapView() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedParkForPopup, setSelectedParkForPopup] = useState(null)
   const [selectedParkId, setSelectedParkId] = useState(null)
+  const [visitedPlaces, setVisitedPlaces] = useState({})
+  const [userProfile, setUserProfile] = useState(null)
+  const [showVisitedOnly, setShowVisitedOnly] = useState(false)
+  const [showUnvisitedOnly, setShowUnvisitedOnly] = useState(false)
   const markerRefs = useRef({})
   const [visibleAttractionTypes, setVisibleAttractionTypes] = useState({
     NationalParks: true,
@@ -230,6 +235,16 @@ function MapView() {
     TrekkingFlights: true,
     MostPhotographed: true
   })
+
+  // Load visited places and user profile on mount
+  useEffect(() => {
+    const visited = loadVisitedPlaces()
+    const profile = loadUserProfile()
+    setVisitedPlaces(visited)
+    setUserProfile(profile)
+    setShowVisitedOnly(profile.preferences?.showVisitedOnly || false)
+    setShowUnvisitedOnly(profile.preferences?.showUnvisitedOnly || false)
+  }, [])
 
   useEffect(() => {
     const loadData = async () => {
@@ -915,6 +930,17 @@ function MapView() {
       return true
     })
     .filter(park => {
+      // Filter by visited status
+      const isVisited = isPlaceVisited(park, visitedPlaces)
+      if (showVisitedOnly && !isVisited) {
+        return false
+      }
+      if (showUnvisitedOnly && isVisited) {
+        return false
+      }
+      return true
+    })
+    .filter(park => {
       // Filter by search query
       if (!searchQuery || searchQuery.trim() === '') {
         return true
@@ -931,7 +957,7 @@ function MapView() {
              country.includes(query) ||
              states.includes(query)
     })
-  }, [parks, visibleRegions, visibleAttractionTypes, searchQuery, currentMapView])
+  }, [parks, visibleRegions, visibleAttractionTypes, searchQuery, currentMapView, visitedPlaces, showVisitedOnly, showUnvisitedOnly])
   
   // Debug logging
   useEffect(() => {
@@ -1206,7 +1232,35 @@ function MapView() {
     return sriLankaRegions.every(region => visibleRegions[region] !== false)
   }
 
+  // Helper function to wrap icon HTML with visited checkmark overlay
+  const wrapWithVisitedOverlay = (iconHtml, visited) => {
+    if (!visited) return iconHtml
+    return `<div style="position: relative;">${iconHtml}
+      <div style="
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 12px;
+        height: 12px;
+        background-color: #4CAF50;
+        border: 2px solid white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        z-index: 1000;
+      ">✓</div>
+    </div>`
+  }
+
   const getParkIcon = (park) => {
+    // Check if place is visited
+    const visited = isPlaceVisited(park, visitedPlaces)
+    
     // Check if it's a most photographed attraction
     const description = park.Description ? String(park.Description).toLowerCase() : ''
     const name = park.Name ? String(park.Name).toLowerCase() : ''
@@ -1243,26 +1297,45 @@ function MapView() {
       
       return L.divIcon({
         className: 'temple-marker',
-        html: `<div style="
-          background-color: ${bgColor};
-          width: 20px;
-          height: 20px;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          border: 2px solid ${borderColor};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        ">
+        html: `<div style="position: relative;">
           <div style="
-            transform: rotate(45deg);
+            background-color: ${bgColor};
+            width: 20px;
+            height: 20px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            border: 2px solid ${borderColor};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+          ">
+            <div style="
+              transform: rotate(45deg);
+              color: white;
+              font-weight: bold;
+              font-size: 11px;
+              line-height: 1;
+              text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            ">🕉️</div>
+          </div>
+          ${visited ? `<div style="
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background-color: #4CAF50;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
             color: white;
             font-weight: bold;
-            font-size: 11px;
-            line-height: 1;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-          ">🕉️</div>
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+          ">✓</div>` : ''}
         </div>`,
         iconSize: [20, 20],
         iconAnchor: [10, 20],
@@ -1283,29 +1356,31 @@ function MapView() {
       // Use custom UNESCO icon - light red if most photographed, light blue otherwise
       const bgColor = isMostPhotographed ? mostPhotographedBg : '#81D4FA'
       const borderColor = isMostPhotographed ? mostPhotographedBorder : '#4FC3F7'
+      const unescoIconHtml = `<div style="
+        background-color: ${bgColor};
+        width: 20px;
+        height: 20px;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        border: 2px solid ${borderColor};
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      ">
+        <div style="
+          transform: rotate(45deg);
+          color: white;
+          font-weight: bold;
+          font-size: 11px;
+          line-height: 1;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        ">🏛️</div>
+      </div>`
+      
       return L.divIcon({
         className: 'unesco-marker',
-        html: `<div style="
-          background-color: ${bgColor};
-          width: 20px;
-          height: 20px;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          border: 2px solid ${borderColor};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        ">
-          <div style="
-            transform: rotate(45deg);
-            color: white;
-            font-weight: bold;
-            font-size: 11px;
-            line-height: 1;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-          ">🏛️</div>
-        </div>`,
+        html: wrapWithVisitedOverlay(unescoIconHtml, visited),
         iconSize: [20, 20],
         iconAnchor: [10, 20],
         popupAnchor: [0, -20]
@@ -1598,29 +1673,31 @@ function MapView() {
       const bgColor = isMostPhotographed ? mostPhotographedBg : nationalParkBg
       const borderColor = isMostPhotographed ? mostPhotographedBorder : nationalParkBorder
       
+      const parkIconHtml = `<div style="
+        background-color: ${bgColor};
+        width: 20px;
+        height: 20px;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        border: 2px solid ${borderColor};
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      ">
+        <div style="
+          transform: rotate(45deg);
+          color: white;
+          font-weight: bold;
+          font-size: 11px;
+          line-height: 1;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        ">🌲</div>
+      </div>`
+      
       return L.divIcon({
         className: 'park-marker',
-        html: `<div style="
-          background-color: ${bgColor};
-          width: 20px;
-          height: 20px;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          border: 2px solid ${borderColor};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        ">
-          <div style="
-            transform: rotate(45deg);
-            color: white;
-            font-weight: bold;
-            font-size: 11px;
-            line-height: 1;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-          ">🌲</div>
-        </div>`,
+        html: wrapWithVisitedOverlay(parkIconHtml, visited),
         iconSize: [20, 20],
         iconAnchor: [10, 20],
         popupAnchor: [0, -20]
@@ -1629,29 +1706,31 @@ function MapView() {
     
     // If it's most photographed but NOT a national park (waterfalls, reserves, etc.), use camera emoji (📷)
     if (isMostPhotographed) {
+      const mostPhotographedIconHtml = `<div style="
+        background-color: ${mostPhotographedBg};
+        width: 20px;
+        height: 20px;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        border: 2px solid ${mostPhotographedBorder};
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      ">
+        <div style="
+          transform: rotate(45deg);
+          color: white;
+          font-weight: bold;
+          font-size: 11px;
+          line-height: 1;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        ">📷</div>
+      </div>`
+      
       return L.divIcon({
         className: 'most-photographed-marker',
-        html: `<div style="
-          background-color: ${mostPhotographedBg};
-          width: 20px;
-          height: 20px;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          border: 2px solid ${mostPhotographedBorder};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        ">
-          <div style="
-            transform: rotate(45deg);
-            color: white;
-            font-weight: bold;
-            font-size: 11px;
-            line-height: 1;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-          ">📷</div>
-        </div>`,
+        html: wrapWithVisitedOverlay(mostPhotographedIconHtml, visited),
         iconSize: [20, 20],
         iconAnchor: [10, 20],
         popupAnchor: [0, -20]
@@ -1812,6 +1891,21 @@ function MapView() {
     }
   }
 
+  const handleToggleVisited = (park) => {
+    const isVisited = isPlaceVisited(park, visitedPlaces)
+    let updated
+    if (isVisited) {
+      updated = markAsNotVisited(park)
+    } else {
+      updated = markAsVisited(park)
+    }
+    setVisitedPlaces(updated)
+    
+    // Update user profile preferences
+    const profile = loadUserProfile()
+    saveUserProfile(profile)
+  }
+
   return (
     <div className="map-view">
       <AttractionSearch
@@ -1831,6 +1925,10 @@ function MapView() {
         visibleRegions={visibleRegions}
         regions={regions}
         currentMapView={currentMapView}
+        showVisitedOnly={showVisitedOnly}
+        setShowVisitedOnly={setShowVisitedOnly}
+        showUnvisitedOnly={showUnvisitedOnly}
+        setShowUnvisitedOnly={setShowUnvisitedOnly}
       />
       <MapContainer
         center={[30.0, 0.0]}
@@ -2117,6 +2215,46 @@ function MapView() {
                   <p className="coordinates">
                     Coordinates: {lat.toFixed(4)}°N, {lon.toFixed(4)}°W
                   </p>
+                  <div className="visited-section" style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #e0e0e0' }}>
+                    <button
+                      type="button"
+                      className={`visited-toggle-button ${isPlaceVisited(park, visitedPlaces) ? 'visited' : ''}`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleToggleVisited(park)
+                      }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        backgroundColor: isPlaceVisited(park, visitedPlaces) ? '#4CAF50' : '#f0f0f0',
+                        color: isPlaceVisited(park, visitedPlaces) ? 'white' : '#333',
+                        border: '1px solid #ddd',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      {isPlaceVisited(park, visitedPlaces) ? (
+                        <>
+                          <span>✓</span>
+                          <span>Marked as Visited</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>○</span>
+                          <span>Mark as Visited</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </Popup>
             </Marker>
@@ -2186,6 +2324,7 @@ function MapView() {
         handleRegionFocus={handleRegionFocus}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        visitedPlaces={visitedPlaces}
       />
     </div>
   )

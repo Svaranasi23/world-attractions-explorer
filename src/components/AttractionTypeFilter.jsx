@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import './AttractionTypeFilter.css'
 
-function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen, availableTypes, showAirports, setShowAirports, visibleRegions, regions, currentMapView }) {
+function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen, availableTypes, showAirports, setShowAirports, visibleRegions, regions, currentMapView, showVisitedOnly, setShowVisitedOnly, showUnvisitedOnly, setShowUnvisitedOnly }) {
   const filterRef = useRef(null)
 
   // Close filter panel when clicking outside
@@ -179,6 +179,34 @@ function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen, ava
                 </label>
               ))
             )}
+          </div>
+
+          {/* Visited Places Filter Section */}
+          <div className="visited-filter-section" style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #e0e0e0', flexShrink: 0 }}>
+            <label className="filter-type-item">
+              <input
+                type="checkbox"
+                checked={showVisitedOnly || false}
+                onChange={(e) => {
+                  setShowVisitedOnly(e.target.checked)
+                  if (e.target.checked) setShowUnvisitedOnly(false)
+                }}
+              />
+              <span className="filter-type-icon">✓</span>
+              <span className="filter-type-label">Visited Only</span>
+            </label>
+            <label className="filter-type-item" style={{ marginTop: '6px' }}>
+              <input
+                type="checkbox"
+                checked={showUnvisitedOnly || false}
+                onChange={(e) => {
+                  setShowUnvisitedOnly(e.target.checked)
+                  if (e.target.checked) setShowVisitedOnly(false)
+                }}
+              />
+              <span className="filter-type-icon">○</span>
+              <span className="filter-type-label">Unvisited Only</span>
+            </label>
           </div>
 
           {/* Airport Toggle Section - Show dynamically when airports are available */}

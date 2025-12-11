@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import StatisticsPanel from './StatisticsPanel'
 import './TabPanel.css'
 
-function TabPanel({ activeTab, setActiveTab, parks, regions, visibleRegions, toggleRegion, setRegionVisibility, handleRegionFocus }) {
+function TabPanel({ activeTab, setActiveTab, parks, regions, visibleRegions, toggleRegion, setRegionVisibility, handleRegionFocus, visitedPlaces }) {
   const [isOpen, setIsOpen] = useState(false)
   const [currentView, setCurrentView] = useState(null) // null = menu list, 'stats' = content view
   
@@ -632,6 +632,7 @@ function TabPanel({ activeTab, setActiveTab, parks, regions, visibleRegions, tog
                 regions={regions}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                visitedPlaces={visitedPlaces}
               />
             )}
           </div>
