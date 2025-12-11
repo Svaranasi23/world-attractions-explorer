@@ -1583,6 +1583,8 @@ function MapView() {
         isOpen={filterPanelOpen}
         setIsOpen={setFilterPanelOpen}
         availableTypes={availableAttractionTypes}
+        showAirports={showAirports}
+        setShowAirports={setShowAirports}
       />
       <MapContainer
         center={[30.0, 0.0]}

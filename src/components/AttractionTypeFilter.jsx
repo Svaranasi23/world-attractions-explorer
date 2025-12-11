@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import './AttractionTypeFilter.css'
 
-function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen, availableTypes }) {
+function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen, availableTypes, showAirports, setShowAirports }) {
   const filterRef = useRef(null)
 
   // Close filter panel when clicking outside
@@ -115,6 +115,22 @@ function AttractionTypeFilter({ visibleTypes, toggleType, isOpen, setIsOpen, ava
                 </label>
               ))
             )}
+          </div>
+
+          {/* Airport Toggle Section */}
+          <div className="airport-toggle-section" style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
+            <label className="filter-type-item airport-toggle">
+              <input
+                type="checkbox"
+                checked={showAirports || false}
+                onChange={(e) => setShowAirports(e.target.checked)}
+              />
+              <span className="filter-type-icon">✈️</span>
+              <span className="filter-type-label">Show Airports</span>
+            </label>
+            <p className="filter-hint-small" style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+              Toggle to show/hide airport markers near visible parks (within 200 miles)
+            </p>
           </div>
         </div>
       )}
