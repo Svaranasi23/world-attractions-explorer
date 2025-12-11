@@ -236,20 +236,31 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab, visitedPlace
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
 
-    // Safely calculate visited statistics
+    // Safely calculate visited statistics by country
     let visitedCount = 0
     let visitedPercentage = '0'
+    const visitedByCountry = {}
+    const totalByCountry = {}
+    
     try {
       if (visitedPlaces && typeof visitedPlaces === 'object' && parks && Array.isArray(parks) && parks.length > 0) {
         // Use the visitedPlaces passed as prop, or load from localStorage
         const placesToCheck = visitedPlaces || loadVisitedPlaces()
-        visitedCount = parks.filter(park => {
+        
+        parks.forEach(park => {
+          const country = park.Country || 'United States'
+          totalByCountry[country] = (totalByCountry[country] || 0) + 1
+          
           try {
-            return isPlaceVisited(park, placesToCheck)
+            if (isPlaceVisited(park, placesToCheck)) {
+              visitedCount++
+              visitedByCountry[country] = (visitedByCountry[country] || 0) + 1
+            }
           } catch (e) {
-            return false
+            // Skip if error checking
           }
-        }).length
+        })
+        
         const percentage = (visitedCount / parks.length) * 100
         visitedPercentage = isNaN(percentage) ? '0' : percentage.toFixed(1)
       }
@@ -258,6 +269,15 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab, visitedPlace
       visitedCount = 0
       visitedPercentage = '0'
     }
+
+    // Sort countries by visited count (descending)
+    const visitedCountriesList = Object.entries(visitedByCountry)
+      .map(([country, count]) => ({
+        country,
+        visited: count,
+        total: totalByCountry[country] || 0
+      }))
+      .sort((a, b) => b.visited - a.visited)
 
     return { 
       topStates, 
@@ -274,7 +294,9 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab, visitedPlace
       topCentralAmericaCountries, 
       countryCounts,
       visitedCount,
-      visitedPercentage
+      visitedPercentage,
+      visitedByCountry,
+      visitedCountriesList
     }
   }, [parks, visitedPlaces])
 
@@ -319,17 +341,120 @@ function StatisticsPanel({ parks, regions, activeTab, setActiveTab, visitedPlace
       <h3>📊 Statistics</h3>
       <p><strong>Total Attractions:</strong> {parks.length || 0}</p>
       {visitedPlaces && typeof visitedPlaces === 'object' && Object.keys(visitedPlaces).length > 0 && stats.visitedCount > 0 && (
-        <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#e8f5e9', borderRadius: '6px', border: '1px solid #4CAF50' }}>
-          <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: '#2e7d32' }}>
-            <span>✓</span> Visited: {stats.visitedCount || 0} / {parks.length || 0} ({stats.visitedPercentage || '0'}%)
-          </p>
-          <div style={{ width: '100%', height: '8px', backgroundColor: '#c8e6c9', borderRadius: '4px', overflow: 'hidden' }}>
+        <div style={{ marginTop: '16px', padding: '20px', background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)', borderRadius: '12px', border: '2px solid #4CAF50', boxShadow: '0 4px 12px rgba(76, 175, 80, 0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <div>
+              <h4 style={{ margin: '0 0 4px 0', fontWeight: 'bold', color: '#1b5e20', fontSize: '20px' }}>
+                🌍 Your Travel Achievements
+              </h4>
+              <p style={{ margin: 0, color: '#2e7d32', fontSize: '14px' }}>
+                You've explored <strong>{stats.visitedCount}</strong> amazing places!
+              </p>
+            </div>
             <div style={{ 
-              width: `${Math.min(100, Math.max(0, parseFloat(stats.visitedPercentage) || 0))}%`, 
-              height: '100%', 
-              backgroundColor: '#4CAF50',
-              transition: 'width 0.3s ease'
-            }}></div>
+              background: '#4CAF50', 
+              color: 'white', 
+              borderRadius: '50%', 
+              width: '60px', 
+              height: '60px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              fontSize: '24px',
+              fontWeight: 'bold',
+              boxShadow: '0 2px 8px rgba(76, 175, 80, 0.3)'
+            }}>
+              {stats.visitedCount}
+            </div>
+          </div>
+          
+          {stats.visitedCountriesList && stats.visitedCountriesList.length > 0 && (
+            <div style={{ marginTop: '16px' }}>
+              <p style={{ margin: '0 0 12px 0', fontWeight: '600', color: '#1b5e20', fontSize: '15px' }}>
+                Countries You've Visited:
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {stats.visitedCountriesList.map(({ country, visited, total }) => (
+                  <div 
+                    key={country}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px 14px',
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      border: '1px solid #a5d6a7',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '20px' }}>
+                        {country === 'United States' ? '🇺🇸' :
+                         country === 'Canada' ? '🇨🇦' :
+                         country === 'India' ? '🇮🇳' :
+                         country === 'Nepal' ? '🇳🇵' :
+                         country === 'Sri Lanka' ? '🇱🇰' :
+                         country === 'Costa Rica' ? '🇨🇷' :
+                         country === 'Thailand' ? '🇹🇭' :
+                         country === 'Indonesia' ? '🇮🇩' :
+                         country === 'Vietnam' ? '🇻🇳' :
+                         country === 'Cambodia' ? '🇰🇭' :
+                         country === 'Myanmar' ? '🇲🇲' :
+                         country === 'Philippines' ? '🇵🇭' :
+                         country === 'Malaysia' ? '🇲🇾' :
+                         country === 'Singapore' ? '🇸🇬' :
+                         country === 'China' ? '🇨🇳' :
+                         country === 'Japan' ? '🇯🇵' :
+                         country === 'South Korea' ? '🇰🇷' :
+                         country === 'Bangladesh' ? '🇧🇩' :
+                         country === 'Pakistan' ? '🇵🇰' :
+                         country === 'Turkey' ? '🇹🇷' :
+                         country === 'Iran' ? '🇮🇷' :
+                         country === 'UAE' || country === 'United Arab Emirates' ? '🇦🇪' :
+                         country === 'Saudi Arabia' ? '🇸🇦' :
+                         country === 'Israel' ? '🇮🇱' :
+                         '🌍'}
+                      </span>
+                      <span style={{ fontWeight: '600', color: '#2e7d32', fontSize: '15px' }}>
+                        {country}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ 
+                        background: '#4CAF50', 
+                        color: 'white', 
+                        padding: '4px 10px', 
+                        borderRadius: '12px',
+                        fontSize: '13px',
+                        fontWeight: 'bold',
+                        minWidth: '50px',
+                        textAlign: 'center'
+                      }}>
+                        {visited} visited
+                      </span>
+                      {total > visited && (
+                        <span style={{ color: '#666', fontSize: '12px' }}>
+                          ({total} total)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <div style={{ 
+            marginTop: '16px', 
+            padding: '12px', 
+            backgroundColor: 'rgba(255, 255, 255, 0.7)', 
+            borderRadius: '8px',
+            textAlign: 'center'
+          }}>
+            <p style={{ margin: 0, color: '#2e7d32', fontSize: '13px', fontStyle: 'italic' }}>
+              🎉 Keep exploring! You've visited <strong>{stats.visitedCountriesList?.length || 0}</strong> {stats.visitedCountriesList?.length === 1 ? 'country' : 'countries'} so far.
+            </p>
           </div>
         </div>
       )}
