@@ -67,16 +67,26 @@ world-attractions-app/
    npm install
    ```
 
-2. **Ensure data files are in place:**
+2. **Configure environment variables:**
+   - Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Edit `.env` and add your Firebase configuration:
+     - Get your Firebase credentials from [Firebase Console](https://console.firebase.google.com/) > Project Settings > General > Your apps
+     - Fill in all `VITE_FIREBASE_*` variables
+   - **Note**: The `.env` file is already in `.gitignore` and will not be committed to git
+
+3. **Ensure data files are in place:**
    - Check that CSV files are in the `data/` directory
    - If missing, run the download scripts (see Data Management section)
 
-3. **Start the development server:**
+4. **Start the development server:**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser:**
+5. **Open your browser:**
    - The app will automatically open at `http://localhost:3000`
 
 ## 📊 Data Management
