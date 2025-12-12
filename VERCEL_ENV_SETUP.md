@@ -8,18 +8,18 @@ Add these environment variables in your Vercel project settings:
 
 | Variable Name | Value | Description |
 |--------------|-------|-------------|
-| `VITE_FIREBASE_API_KEY` | `YOUR_FIREBASE_API_KEY` | Firebase API Key (get from Firebase Console) |
-| `VITE_FIREBASE_AUTH_DOMAIN` | `your-project.firebaseapp.com` | Firebase Auth Domain |
-| `VITE_FIREBASE_PROJECT_ID` | `your-project-id` | Firebase Project ID |
-| `VITE_FIREBASE_STORAGE_BUCKET` | `your-project.appspot.com` | Firebase Storage Bucket |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | `YOUR_SENDER_ID` | Firebase Messaging Sender ID |
-| `VITE_FIREBASE_APP_ID` | `YOUR_APP_ID` | Firebase App ID |
+| `VITE_FIREBASE_API_KEY` | `YOUR_FIREBASE_API_KEY_HERE` | Firebase API Key |
+| `VITE_FIREBASE_AUTH_DOMAIN` | `world-attractions-explorer.firebaseapp.com` | Firebase Auth Domain |
+| `VITE_FIREBASE_PROJECT_ID` | `world-attractions-explorer` | Firebase Project ID |
+| `VITE_FIREBASE_STORAGE_BUCKET` | `world-attractions-explorer.appspot.com` | Firebase Storage Bucket |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | `219161346422` | Firebase Messaging Sender ID |
+| `VITE_FIREBASE_APP_ID` | `1:219161346422:web:b1c38dea46bb73142bba57` | Firebase App ID |
 
 ## How to Add Environment Variables in Vercel
 
 ### Step 1: Go to Vercel Dashboard
 1. Open [Vercel Dashboard](https://vercel.com/dashboard)
-2. Select your project: **world-attractions-app** (or your project name)
+2. Select your project: **world-attractions-explorer** (or your project name)
 
 ### Step 2: Navigate to Settings
 1. Click on your project
@@ -30,7 +30,7 @@ Add these environment variables in your Vercel project settings:
 For each variable above:
 1. Click **Add New**
 2. Enter the **Key** (e.g., `VITE_FIREBASE_API_KEY`)
-3. Enter the **Value** (get from your `.env` file or Firebase Console)
+3. Enter the **Value** (e.g., `YOUR_FIREBASE_API_KEY_HERE`)
 4. Select the environments where it should be available:
    - ✅ **Production**
    - ✅ **Preview**
@@ -44,22 +44,16 @@ After adding all variables:
 3. Click **Redeploy**
 4. Or push a new commit to trigger automatic deployment
 
-## Quick Copy-Paste Template
-
-**⚠️ IMPORTANT:** Replace the placeholder values below with your actual Firebase credentials from Firebase Console or your local `.env` file.
+## Quick Copy-Paste Values
 
 ```
 VITE_FIREBASE_API_KEY=YOUR_FIREBASE_API_KEY_HERE
-VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=YOUR_SENDER_ID
-VITE_FIREBASE_APP_ID=YOUR_APP_ID
+VITE_FIREBASE_AUTH_DOMAIN=world-attractions-explorer.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=world-attractions-explorer
+VITE_FIREBASE_STORAGE_BUCKET=world-attractions-explorer.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=219161346422
+VITE_FIREBASE_APP_ID=1:219161346422:web:b1c38dea46bb73142bba57
 ```
-
-**Where to get these values:**
-- Firebase Console → Project Settings → General → Your apps → Web app config
-- Or copy from your local `.env` file (never commit `.env` to git)
 
 ## Important Notes
 

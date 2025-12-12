@@ -224,7 +224,7 @@ For this project, **Vercel** is the easiest and best option because:
 5. Click "Deploy"
 6. Done! 🎉
 
-Your app will be live at: `https://world-attractions-app.vercel.app` (or your custom domain)
+Your app will be live at: `https://world-attractions-explorer.vercel.app` (or your custom domain)
 
 ---
 

@@ -123,6 +123,20 @@ export const resetPassword = async (email) => {
       errorMessage = 'Too many requests. Please wait a few minutes and try again.'
     } else if (error.code === 'auth/quota-exceeded') {
       errorMessage = 'Email quota exceeded. Please try again later.'
+    } else if (error.code === 'auth/unauthorized-continue-uri') {
+      const currentDomain = window.location.hostname
+      errorMessage = `Domain "${currentDomain}" is not authorized. Please add this domain to Firebase authorized domains. See console for details.`
+      console.error('🔴 Domain authorization error!')
+      console.error('Current domain:', currentDomain)
+      console.error('Full origin:', window.location.origin)
+      console.error('')
+      console.error('📋 To fix this:')
+      console.error('1. Go to: https://console.firebase.google.com/')
+      console.error('2. Select project: world-attractions-explorer')
+      console.error('3. Go to: Authentication → Settings → Authorized domains')
+      console.error(`4. Click "Add domain" and add: ${currentDomain}`)
+      console.error('5. Wait 2-3 minutes for changes to propagate')
+      console.error('6. Try password reset again')
     } else {
       errorMessage = error.message || errorMessage
     }

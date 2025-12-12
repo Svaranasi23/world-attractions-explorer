@@ -848,22 +848,29 @@ function MapView() {
       let attractionType = null
       const country = park.Country || 'United States'
       
+      // Check if we're in world view (low zoom)
+      const isWorldView = !currentMapView || !currentMapView.zoom || currentMapView.zoom <= 3
+      
       // Check if map is zoomed into India, Nepal, or Sri Lanka
+      // Only consider it zoomed in if zoom is high enough AND center is within country bounds AND not in world view
       const isMapZoomedIntoIndia = currentMapView && 
                                    currentMapView.center && 
                                    currentMapView.zoom >= 4 &&
+                                   !isWorldView &&
                                    currentMapView.center.lat >= 6.0 && currentMapView.center.lat <= 37.0 &&
                                    currentMapView.center.lng >= 68.0 && currentMapView.center.lng <= 97.0
       
       const isMapZoomedIntoNepal = currentMapView && 
                                    currentMapView.center && 
                                    currentMapView.zoom >= 5 &&
+                                   !isWorldView &&
                                    currentMapView.center.lat >= 26.0 && currentMapView.center.lat <= 31.0 &&
                                    currentMapView.center.lng >= 80.0 && currentMapView.center.lng <= 89.0
       
       const isMapZoomedIntoSriLanka = currentMapView && 
                                       currentMapView.center && 
                                       currentMapView.zoom >= 5 &&
+                                      !isWorldView &&
                                       currentMapView.center.lat >= 5.5 && currentMapView.center.lat <= 10.0 &&
                                       currentMapView.center.lng >= 79.0 && currentMapView.center.lng <= 82.0
       
@@ -1841,22 +1848,29 @@ function MapView() {
   }
 
   const toggleAttractionType = (type) => {
+    // Check if we're in world view (low zoom)
+    const isWorldView = !currentMapView || !currentMapView.zoom || currentMapView.zoom <= 3
+    
     // Check if map is zoomed into India, Nepal, or Sri Lanka
+    // Only consider it zoomed in if zoom is high enough AND center is within country bounds AND not in world view
     const isMapZoomedIntoIndia = currentMapView && 
                                  currentMapView.center && 
                                  currentMapView.zoom >= 4 &&
+                                 !isWorldView &&
                                  currentMapView.center.lat >= 6.0 && currentMapView.center.lat <= 37.0 &&
                                  currentMapView.center.lng >= 68.0 && currentMapView.center.lng <= 97.0
     
     const isMapZoomedIntoNepal = currentMapView && 
                                  currentMapView.center && 
                                  currentMapView.zoom >= 5 &&
+                                 !isWorldView &&
                                  currentMapView.center.lat >= 26.0 && currentMapView.center.lat <= 31.0 &&
                                  currentMapView.center.lng >= 80.0 && currentMapView.center.lng <= 89.0
     
     const isMapZoomedIntoSriLanka = currentMapView && 
                                     currentMapView.center && 
                                     currentMapView.zoom >= 5 &&
+                                    !isWorldView &&
                                     currentMapView.center.lat >= 5.5 && currentMapView.center.lat <= 10.0 &&
                                     currentMapView.center.lng >= 79.0 && currentMapView.center.lng <= 82.0
     

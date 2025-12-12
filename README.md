@@ -21,7 +21,7 @@ A modern React-based web application for exploring world attractions including n
 ## 📁 Project Structure
 
 ```
-world-attractions-app/
+world-attractions-explorer/
 ├── src/
 │   ├── components/          # React components
 │   │   ├── StatisticsPanel.jsx
