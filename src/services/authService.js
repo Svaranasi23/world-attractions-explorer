@@ -7,7 +7,8 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth'
 import { auth } from './firebaseConfig'
 
@@ -90,6 +91,42 @@ export const getCurrentUser = () => {
   } catch (error) {
     console.error('Get current user error:', error)
     return null
+  }
+}
+
+// Send password reset email
+export const resetPassword = async (email) => {
+  if (!isFirebaseAvailable()) {
+    return { success: false, error: 'Firebase is not initialized. Please check your configuration.' }
+  }
+  try {
+    // Validate email format first
+    if (!email || !email.includes('@')) {
+      return { success: false, error: 'Please enter a valid email address' }
+    }
+    
+    await sendPasswordResetEmail(auth, email, {
+      url: window.location.origin,
+      handleCodeInApp: false
+    })
+    console.log('Password reset email sent successfully to:', email)
+    return { success: true }
+  } catch (error) {
+    console.error('Password reset error:', error)
+    // Provide user-friendly error messages
+    let errorMessage = 'Failed to send password reset email'
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'No account found with this email address'
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Invalid email address'
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMessage = 'Too many requests. Please wait a few minutes and try again.'
+    } else if (error.code === 'auth/quota-exceeded') {
+      errorMessage = 'Email quota exceeded. Please try again later.'
+    } else {
+      errorMessage = error.message || errorMessage
+    }
+    return { success: false, error: errorMessage }
   }
 }
 
