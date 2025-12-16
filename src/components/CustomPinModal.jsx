@@ -75,30 +75,121 @@ const CustomPinModal = ({
           
           const data = await response.json()
           
-          // Extract city information
-          const city = data.city || data.locality || data.principalSubdivision || null
-          const state = data.principalSubdivision || data.administrativeArea || null
-          const country = data.countryName || null
+          // Debug: Log the full API response to understand structure
+          console.log('📍 Reverse geocoding API response:', data)
           
-          if (city) {
-            let cityName = city
+          const country = data.countryName || data.countryCode || null
+          const isIndia = country === 'India' || country === 'IN'
+          
+          // Extract city information - BigDataCloud API structure
+          // For India, administrative levels are more important due to dense population
+          let finalCity = null
+          let state = null
+          
+          if (isIndia && data.localityInfo?.administrative) {
+            // For India, check administrative levels more carefully
+            // Order typically: 0=country, 1=state, 2=district, 3=subdistrict, 4=city/town, 5=village
+            const adminLevels = data.localityInfo.administrative.sort((a, b) => a.order - b.order)
+            
+            // Log administrative levels for debugging
+            console.log('📍 India administrative levels:', adminLevels)
+            
+            // For India, prefer city/town (order 4-5) over village (order 6+)
+            // Try to find the most specific city/town name
+            for (const level of adminLevels) {
+              // Order 4-5 are typically city/town/municipality
+              if (level.order >= 4 && level.order <= 5 && level.name) {
+                // Skip if it's a state name (usually order 1)
+                if (level.order !== 1) {
+                  finalCity = level.name
+                  break
+                }
+              }
+            }
+            
+            // If no city found, try order 6-7 (village/town)
+            if (!finalCity) {
+              for (const level of adminLevels) {
+                if (level.order >= 6 && level.order <= 7 && level.name) {
+                  finalCity = level.name
+                  break
+                }
+              }
+            }
+            
+            // Extract state (usually order 1)
+            const stateLevel = adminLevels.find(a => a.order === 1)
+            if (stateLevel) {
+              state = stateLevel.name
+            }
+          }
+          
+          // Fallback to standard fields if not found in administrative levels
+          if (!finalCity) {
+            finalCity = data.city || 
+                       data.locality || 
+                       data.localityInfo?.administrative?.find(a => a.order === 6)?.name ||
+                       data.localityInfo?.administrative?.find(a => a.order === 7)?.name ||
+                       data.principalSubdivision || 
+                       null
+          }
+          
+          if (!state) {
+            state = data.principalSubdivision || 
+                   data.administrativeArea || 
+                   data.localityInfo?.administrative?.find(a => a.order === 4)?.name ||
+                   null
+          }
+          
+          // Additional fallback: check all administrative levels for city-like names
+          if (!finalCity && data.localityInfo?.administrative) {
+            const adminLevels = data.localityInfo.administrative
+            // Look for any level that might be a city (skip country and state)
+            for (const level of adminLevels) {
+              if (level.order > 1 && level.order < 8 && level.name) {
+                // Check if it looks like a city name (not too long, not a state)
+                const name = level.name.trim()
+                if (name.length > 2 && name.length < 50 && 
+                    !name.toLowerCase().includes('district') &&
+                    !name.toLowerCase().includes('state')) {
+                  finalCity = name
+                  break
+                }
+              }
+            }
+          }
+          
+          if (finalCity) {
+            let cityName = finalCity.trim()
+            
             // Add state if available and different from city
             if (state && !cityName.toLowerCase().includes(state.toLowerCase())) {
-              // Extract state abbreviation or name
-              const stateAbbr = state.length <= 3 ? state : state.split(' ').map(w => w[0]).join('')
-              cityName = `${city}, ${stateAbbr}`
+              // For India, use full state name
+              if (isIndia) {
+                cityName = `${cityName}, ${state}`
+              } else if (country === 'United States' && state.length > 3) {
+                // For US, try to abbreviate
+                const stateAbbr = state.split(' ').map(w => w[0]).join('').toUpperCase()
+                cityName = `${cityName}, ${stateAbbr}`
+              } else {
+                cityName = `${cityName}, ${state}`
+              }
             }
+            
+            console.log('📍 Extracted city:', { cityName, finalCity, state, country })
             
             return {
               name: cityName,
               fullName: cityName,
               source: 'reverseGeocode',
               distance: 0, // Exact location
-              city: city,
+              city: finalCity,
               state: state,
               country: country
             }
           }
+          
+          console.log('📍 No city found in reverse geocoding response')
           
           return null
         } catch (error) {
@@ -256,30 +347,59 @@ const CustomPinModal = ({
         })
       }
       
-      // Use reverse geocoding as fallback (if no park-based suggestions found)
-      // This works for ANY city, not just major ones
-      if (suggestions.length === 0 || suggestions.every(s => s.source === 'airport')) {
-        setLoadingLocation(true)
-        try {
-          const reverseGeocodeResult = await reverseGeocodeCity(lat, lon)
-          
-          if (isMounted && reverseGeocodeResult) {
-            // Check if we already have this city from parks or airports
-            const existing = suggestions.find(s => 
-              s.name.toLowerCase().includes(reverseGeocodeResult.city.toLowerCase()) ||
-              (reverseGeocodeResult.state && s.name.toLowerCase().includes(reverseGeocodeResult.state.toLowerCase()))
-            )
+      // Always use reverse geocoding to get the actual city name from coordinates
+      // This works for ANY city worldwide (India, US, etc.)
+      // Park-based suggestions are prioritized, but reverse geocoding provides the actual location
+      setLoadingLocation(true)
+      try {
+        const reverseGeocodeResult = await reverseGeocodeCity(lat, lon)
+        
+        if (isMounted && reverseGeocodeResult) {
+          // Check if we already have this EXACT city from parks or airports
+          // Only match on city name, not state (to avoid false matches in same state)
+          const geocodeCity = reverseGeocodeResult.city.toLowerCase().trim()
+          const existing = suggestions.find(s => {
+            const sName = s.name.toLowerCase()
+            // Extract just the city part (before comma) from suggestion
+            const sCity = sName.split(',')[0].trim()
             
-            if (!existing) {
+            // Match only if city names are the same (not just state)
+            // Allow small variations (e.g., "Guntur" matches "Guntur, Andhra Pradesh")
+            return sCity === geocodeCity || 
+                   sName.startsWith(geocodeCity + ',') ||
+                   (geocodeCity.length > 3 && sCity.includes(geocodeCity)) ||
+                   (sCity.length > 3 && geocodeCity.includes(sCity))
+          })
+          
+          // Always add reverse geocode result - it's the most accurate (distance = 0)
+          // Even if a similar city exists, the reverse geocode is the exact location
+          if (!existing) {
+            suggestions.push(reverseGeocodeResult)
+          } else {
+            // If we found a match, replace it with reverse geocode since it's more accurate
+            const existingIndex = suggestions.findIndex(s => {
+              const sName = s.name.toLowerCase()
+              const sCity = sName.split(',')[0].trim()
+              return sCity === geocodeCity || 
+                     sName.startsWith(geocodeCity + ',') ||
+                     (geocodeCity.length > 3 && sCity.includes(geocodeCity))
+            })
+            
+            if (existingIndex >= 0) {
+              // Always replace with reverse geocode - it's the exact location (distance = 0)
+              // This ensures "Guntur" from reverse geocode replaces "Vijayawada" from a distant attraction
+              suggestions[existingIndex] = reverseGeocodeResult
+            } else {
+              // If no exact match found, add it anyway
               suggestions.push(reverseGeocodeResult)
             }
           }
-        } catch (error) {
-          console.error('Reverse geocoding failed:', error)
-        } finally {
-          if (isMounted) {
-            setLoadingLocation(false)
-          }
+        }
+      } catch (error) {
+        console.error('Reverse geocoding failed:', error)
+      } finally {
+        if (isMounted) {
+          setLoadingLocation(false)
         }
       }
       
@@ -307,9 +427,23 @@ const CustomPinModal = ({
         })
       }
       
-      // Sort with priority: park-based > reverse geocode > airports, then by distance
+      // Sort with priority: reverse geocode (exact location) > close park-based > airports, then by distance
       suggestions.sort((a, b) => {
-        // Priority order: attraction > reverseGeocode > airport
+        // Reverse geocode (distance = 0) should always be first - it's the exact location
+        if (a.distance === 0 && b.distance !== 0) return -1
+        if (a.distance !== 0 && b.distance === 0) return 1
+        
+        // If both are reverse geocode (distance = 0), they're equal
+        if (a.distance === 0 && b.distance === 0) return 0
+        
+        // For non-exact locations, prioritize close park-based suggestions (< 5 miles) over others
+        const aIsClosePark = a.source === 'attraction' && a.distance < 5
+        const bIsClosePark = b.source === 'attraction' && b.distance < 5
+        
+        if (aIsClosePark && !bIsClosePark) return -1
+        if (!aIsClosePark && bIsClosePark) return 1
+        
+        // Then prioritize by source type: attraction > reverseGeocode > airport
         const priority = { 'attraction': 1, 'reverseGeocode': 2, 'airport': 3 }
         const aPriority = priority[a.source] || 99
         const bPriority = priority[b.source] || 99
@@ -318,7 +452,7 @@ const CustomPinModal = ({
           return aPriority - bPriority
         }
         
-        // If same priority, sort by distance
+        // Finally, sort by distance (closest first)
         return (a.distance || 0) - (b.distance || 0)
       })
       
