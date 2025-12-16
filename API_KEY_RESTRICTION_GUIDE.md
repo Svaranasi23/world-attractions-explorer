@@ -35,6 +35,7 @@ To secure your API key, you need to allow these specific APIs:
 1. Under **Application restrictions**, select **HTTP referrers (web sites)**
 2. Add your website URLs (one per line, use exact format):
    - `https://world-attractions-explorer.vercel.app/*` (or your production domain)
+   - `https://world-attractions-explorer.firebaseapp.com/*` (Firebase hosting domain - REQUIRED)
    - `http://localhost/*` (for local development - note: no wildcard after port)
    - `http://localhost:5173/*` (if using Vite default port)
    - `http://localhost:3000/*` (if using port 3000)

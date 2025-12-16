@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, createRef } from 'react'
+import React, { useState, useEffect, useMemo, useRef, createRef, useCallback } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, FeatureGroup, LayerGroup, useMap, GeoJSON, ZoomControl, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -7,6 +7,7 @@ import { loadParksData, loadAirportsData, findNearbyAirports, findNearbyParks, c
 import { loadVisitedPlaces, markAsVisited, markAsNotVisited, isPlaceVisited, getVisitedCount, loadUserProfile, saveUserProfile, syncVisitedPlaces } from '../services/visitedPlacesService'
 import { loadCustomPins, addCustomPin, deleteCustomPin, syncCustomPins } from '../services/customPinsService'
 import { onAuthStateChange, getCurrentUser } from '../services/authService'
+import { formatCoordinates } from '../utils/coordinateFormatter'
 import AuthModal from '../components/AuthModal'
 import CustomPinModal from '../components/CustomPinModal'
 import MapClickHandler from '../components/MapClickHandler'
@@ -247,6 +248,26 @@ function MapView() {
   const [customPinModalOpen, setCustomPinModalOpen] = useState(false)
   const [pendingPinLocation, setPendingPinLocation] = useState(null)
 
+  // Memoized callbacks - must be defined before useEffect hooks
+  const handleSearch = useCallback((query) => {
+    setSearchQuery(query)
+  }, [])
+
+  const handleSelectAttraction = useCallback((park) => {
+    const lat = parseFloat(park.Latitude)
+    const lon = parseFloat(park.Longitude)
+    
+    if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
+      // Set the park to open popup after map focuses
+      setSelectedParkForPopup(park)
+      
+      // Focus the map on the attraction
+      setMapFocus({
+        center: [lat, lon],
+        zoom: 12
+      })
+    }
+  }, [])
 
   // Load visited places and user profile on mount, and sync with Firestore if logged in
   useEffect(() => {
@@ -1930,26 +1951,6 @@ function MapView() {
     }
   }
 
-  const handleSearch = (query) => {
-    setSearchQuery(query)
-  }
-
-  const handleSelectAttraction = (park) => {
-    const lat = parseFloat(park.Latitude)
-    const lon = parseFloat(park.Longitude)
-    
-    if (!isNaN(lat) && !isNaN(lon) && lat !== 0 && lon !== 0) {
-      // Set the park to open popup after map focuses
-      setSelectedParkForPopup(park)
-      
-      // Focus the map on the attraction
-      setMapFocus({
-        center: [lat, lon],
-        zoom: 12
-      })
-    }
-  }
-
   const handleToggleVisited = async (park) => {
     const isVisited = isPlaceVisited(park, visitedPlaces)
     let updated
@@ -1979,11 +1980,13 @@ function MapView() {
       setVisitedPlaces(local)
       const localPins = loadCustomPins()
       setCustomPins(localPins)
+      // Disable pin mode when user logs out
+      setPinModeEnabled(false)
     }
   }
 
   const handleMapClick = (lat, lon) => {
-    if (pinModeEnabled) {
+    if (pinModeEnabled && currentUser) {
       setPendingPinLocation({ lat, lon })
       setCustomPinModalOpen(true)
     }
@@ -2058,15 +2061,16 @@ function MapView() {
         zoom={2}
         style={{ height: '100vh', width: '100%' }}
         minZoom={2}
-        maxZoom={18}
+        maxZoom={19}
         zoomControl={false}
         ref={mapRef}
       >
         <ZoomControl position="bottomright" />
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          subdomains="abcd"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          subdomains={['a', 'b', 'c']}
+          maxZoom={19}
         />
         
         {/* Geographic Layers */}
@@ -2337,7 +2341,7 @@ function MapView() {
                     </div>
                   )}
                   <p className="coordinates">
-                    Coordinates: {lat.toFixed(4)}°N, {lon.toFixed(4)}°W
+                    Coordinates: {formatCoordinates(lat, lon, 4)}
                   </p>
                   <div className="visited-section" style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #e0e0e0' }}>
                     <button
@@ -2403,7 +2407,7 @@ function MapView() {
                     <p className="description">{pin.description}</p>
                   )}
                   <p className="coordinates">
-                    Coordinates: {lat.toFixed(6)}°N, {lon.toFixed(6)}°W
+                    Coordinates: {formatCoordinates(lat, lon, 6)}
                   </p>
                   <button
                     type="button"
@@ -2478,7 +2482,7 @@ function MapView() {
                     </p>
                   )}
                   <p className="coordinates">
-                    Coordinates: {lat.toFixed(4)}°N, {lon.toFixed(4)}°W
+                    Coordinates: {formatCoordinates(lat, lon, 4)}
                   </p>
                 </div>
               </Popup>
@@ -2525,6 +2529,8 @@ function MapView() {
           lon={pendingPinLocation.lon}
           parks={parks}
           airports={airports}
+          visitedPlaces={visitedPlaces}
+          onMarkVisited={handleToggleVisited}
         />
       )}
 
@@ -2534,10 +2540,16 @@ function MapView() {
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
+          if (!currentUser) {
+            // User not logged in, open auth modal
+            setAuthModalOpen(true)
+            return
+          }
           setPinModeEnabled(!pinModeEnabled)
         }}
-        className={`pin-mode-toggle ${pinModeEnabled ? 'active' : ''}`}
-        title={pinModeEnabled ? 'Click on map to add a pin. Click again to disable.' : 'Enable pin mode to add custom locations'}
+        className={`pin-mode-toggle ${pinModeEnabled ? 'active' : ''} ${!currentUser ? 'disabled' : ''}`}
+        title={!currentUser ? 'Please log in to add custom pins' : (pinModeEnabled ? 'Click on map to add a pin. Click again to disable.' : 'Enable pin mode to add custom locations')}
+        disabled={!currentUser}
       >
         {pinModeEnabled ? '📍 Pin Mode ON' : '📍 Add Pin'}
       </button>
