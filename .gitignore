@@ -29,6 +29,10 @@ dist-ssr
 .env.production.local
 .env.development.local
 
+# API key replacement files (used for git history cleanup)
+api-key-replacements.txt
+*replacements.txt
+
 # Python
 __pycache__/
 *.py[cod]
