@@ -5,8 +5,11 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet.heat'
 import { loadParksData, loadAirportsData, findNearbyAirports, findNearbyParks, categorizeParksByRegion, calculateDistance } from '../services/dataService'
 import { loadVisitedPlaces, markAsVisited, markAsNotVisited, isPlaceVisited, getVisitedCount, loadUserProfile, saveUserProfile, syncVisitedPlaces } from '../services/visitedPlacesService'
+import { loadCustomPins, addCustomPin, deleteCustomPin, syncCustomPins, getCustomPinsArray } from '../services/customPinsService'
 import { onAuthStateChange, getCurrentUser } from '../services/authService'
 import AuthModal from '../components/AuthModal'
+import CustomPinModal from '../components/CustomPinModal'
+import MapClickHandler from '../components/MapClickHandler'
 import TabPanel from '../components/TabPanel'
 import MapController from '../components/MapController'
 import MapViewTracker from '../components/MapViewTracker'
@@ -239,6 +242,10 @@ function MapView() {
     TrekkingFlights: true,
     MostPhotographed: true
   })
+  const [customPins, setCustomPins] = useState({})
+  const [pinModeEnabled, setPinModeEnabled] = useState(false)
+  const [customPinModalOpen, setCustomPinModalOpen] = useState(false)
+  const [pendingPinLocation, setPendingPinLocation] = useState(null)
 
 
   // Load visited places and user profile on mount, and sync with Firestore if logged in
@@ -252,6 +259,10 @@ function MapView() {
       // Sync visited places (will use Firestore if logged in, localStorage otherwise)
       const synced = await syncVisitedPlaces()
       setVisitedPlaces(synced)
+      
+      // Sync custom pins
+      const syncedPins = await syncCustomPins()
+      setCustomPins(syncedPins)
     }
     
     loadAndSync()
@@ -263,10 +274,14 @@ function MapView() {
         // User logged in, sync with Firestore
         const synced = await syncVisitedPlaces()
         setVisitedPlaces(synced)
+        const syncedPins = await syncCustomPins()
+        setCustomPins(syncedPins)
       } else {
         // User logged out, just use localStorage
         const local = loadVisitedPlaces()
         setVisitedPlaces(local)
+        const localPins = loadCustomPins()
+        setCustomPins(localPins)
       }
     })
     
@@ -1956,11 +1971,62 @@ function MapView() {
       // User logged in, sync with Firestore
       const synced = await syncVisitedPlaces()
       setVisitedPlaces(synced)
+      const syncedPins = await syncCustomPins()
+      setCustomPins(syncedPins)
     } else {
       // User logged out, just use localStorage
       const local = loadVisitedPlaces()
       setVisitedPlaces(local)
+      const localPins = loadCustomPins()
+      setCustomPins(localPins)
     }
+  }
+
+  const handleMapClick = (lat, lon) => {
+    if (pinModeEnabled) {
+      setPendingPinLocation({ lat, lon })
+      setCustomPinModalOpen(true)
+    }
+  }
+
+  const handleSaveCustomPin = async (lat, lon, name, description) => {
+    const updated = await addCustomPin(lat, lon, name, description)
+    setCustomPins(updated)
+  }
+
+  const handleDeleteCustomPin = async (pinId) => {
+    const updated = await deleteCustomPin(pinId)
+    setCustomPins(updated)
+  }
+
+  const getCustomPinIcon = () => {
+    return L.divIcon({
+      className: 'custom-pin-marker',
+      html: `<div style="
+        background-color: #9C27B0;
+        width: 24px;
+        height: 24px;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        border: 2px solid #7B1FA2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      ">
+        <div style="
+          transform: rotate(45deg);
+          color: white;
+          font-weight: bold;
+          font-size: 14px;
+          line-height: 1;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+       ">📍</div>
+      </div>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 24],
+      popupAnchor: [0, -24]
+    })
   }
 
   return (
@@ -2031,6 +2097,7 @@ function MapView() {
           selectedPark={selectedParkForPopup}
           onPopupOpened={() => setSelectedParkForPopup(null)}
         />
+        <MapClickHandler onMapClick={handleMapClick} enabled={pinModeEnabled} />
         <MapViewTracker onViewChange={setCurrentMapView} />
         <TooltipZIndexFix />
         <PopupPositionRestore />
@@ -2318,6 +2385,54 @@ function MapView() {
           )
         })}
 
+        {/* Custom Pin Markers */}
+        {getCustomPinsArray().map((pin) => {
+          const lat = pin.coordinates.lat
+          const lon = pin.coordinates.lon
+          
+          return (
+            <Marker
+              key={pin.id}
+              position={[lat, lon]}
+              icon={getCustomPinIcon()}
+            >
+              <Popup autoPan={true} autoPanPadding={[100, 50]}>
+                <div className="custom-pin-popup">
+                  <h3>📍 {pin.name}</h3>
+                  {pin.description && (
+                    <p className="description">{pin.description}</p>
+                  )}
+                  <p className="coordinates">
+                    Coordinates: {lat.toFixed(6)}°N, {lon.toFixed(6)}°W
+                  </p>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleDeleteCustomPin(pin.id)
+                    }}
+                    className="delete-pin-button"
+                    style={{
+                      marginTop: '10px',
+                      padding: '8px 16px',
+                      backgroundColor: '#f44336',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    🗑️ Delete Pin
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          )
+        })}
+
         {/* Airport Markers - Only show airports near visible parks */}
         {filteredAirports.map((airport, index) => {
           const lat = parseFloat(airport.Latitude)
@@ -2397,6 +2512,33 @@ function MapView() {
           onAuthChange={handleAuthChange}
         />
       )}
+      
+      {customPinModalOpen && pendingPinLocation && (
+        <CustomPinModal
+          isOpen={customPinModalOpen}
+          onClose={() => {
+            setCustomPinModalOpen(false)
+            setPendingPinLocation(null)
+          }}
+          onSave={handleSaveCustomPin}
+          lat={pendingPinLocation.lat}
+          lon={pendingPinLocation.lon}
+        />
+      )}
+
+      {/* Pin Mode Toggle Button */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          setPinModeEnabled(!pinModeEnabled)
+        }}
+        className={`pin-mode-toggle ${pinModeEnabled ? 'active' : ''}`}
+        title={pinModeEnabled ? 'Click on map to add a pin. Click again to disable.' : 'Enable pin mode to add custom locations'}
+      >
+        {pinModeEnabled ? '📍 Pin Mode ON' : '📍 Add Pin'}
+      </button>
     </div>
   )
 }
