@@ -160,12 +160,13 @@
   display: none !important; /* Hide top-left controls */
 }
 
-/* CRITICAL: Force zoom controls to bottom-right on desktop - use highest specificity */
-/* Use body/html selectors to ensure this overrides Leaflet's default CSS in production builds */
+/* CRITICAL: Force zoom controls to bottom-right by default (desktop) - use highest specificity */
+/* Use body/html/#root selectors to ensure this overrides Leaflet's default CSS in production builds */
+/* Default to desktop positioning - mobile will override via media query */
 body .leaflet-bottom.leaflet-right,
 html body .leaflet-bottom.leaflet-right,
-#root .leaflet-bottom.leaflet-right,
-body #root .leaflet-bottom.leaflet-right {
+body #root .leaflet-bottom.leaflet-right,
+html body #root .leaflet-bottom.leaflet-right {
   bottom: 20px !important;
   right: 20px !important;
   left: auto !important;
@@ -179,8 +180,8 @@ body #root .leaflet-bottom.leaflet-right {
 /* Also handle .leaflet-top.leaflet-right in case it's used */
 body .leaflet-top.leaflet-right,
 html body .leaflet-top.leaflet-right,
-#root .leaflet-top.leaflet-right,
-body #root .leaflet-top.leaflet-right {
+body #root .leaflet-top.leaflet-right,
+html body #root .leaflet-top.leaflet-right {
   top: auto !important;
   bottom: 20px !important;
   right: 20px !important;
