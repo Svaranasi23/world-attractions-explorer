@@ -161,23 +161,29 @@
   bottom: 20px !important;
   right: 20px !important;
   left: auto !important;
-  z-index: 1002 !important; /* Above hamburger menu (1000) and overlay (999) */
+  z-index: 1006 !important; /* Higher z-index to ensure visibility above other elements */
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Ensure zoom controls are visible and properly positioned */
 .leaflet-control-zoom {
   margin: 0 !important;
-  z-index: 1002 !important;
+  z-index: 1006 !important; /* Higher z-index to ensure visibility */
   position: relative !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Ensure all Leaflet controls are above the menu */
 .leaflet-control-container {
-  z-index: 1002 !important;
+  z-index: 1006 !important;
 }
 
 .leaflet-control {
-  z-index: 1002 !important;
+  z-index: 1006 !important;
 }
 
 /* On desktop, when menu is open (350px wide), move zoom controls left to avoid overlap */
@@ -191,8 +197,22 @@
   .leaflet-top.leaflet-right {
     bottom: calc(15px + env(safe-area-inset-bottom)) !important;
     bottom: calc(15px + constant(safe-area-inset-bottom)) !important; /* iOS 11.0-11.2 */
-    right: calc(15px + env(safe-area-inset-right)) !important;
-    right: calc(15px + constant(safe-area-inset-right)) !important; /* iOS 11.0-11.2 */
+    /* Position to the left of legend button (legend is at ~70px, zoom controls are ~60px wide) */
+    right: calc(75px + env(safe-area-inset-right)) !important;
+    right: calc(75px + constant(safe-area-inset-right)) !important; /* iOS 11.0-11.2 */
+    z-index: 1006 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Ensure zoom control buttons are visible */
+  .leaflet-control-zoom-in,
+  .leaflet-control-zoom-out {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
 }
 
