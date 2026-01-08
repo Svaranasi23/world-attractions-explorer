@@ -212,15 +212,12 @@ body #root .leaflet-top.leaflet-right {
 
 /* Mobile layout: zoom controls bottom-left, legend bottom-right, add pin above zoom on left */
 /* Use max-width to ensure mobile rules only apply on mobile - PUT THIS FIRST */
+/* IMPORTANT: Lower specificity than desktop so desktop can override */
 @media screen and (max-width: 768px) {
   /* On mobile, move zoom controls to bottom-left to avoid safe area issues */
-  /* Use maximum specificity to override desktop rules and Leaflet defaults */
-  body .leaflet-bottom.leaflet-right,
-  body .leaflet-top.leaflet-right,
-  html body .leaflet-bottom.leaflet-right,
-  html body .leaflet-top.leaflet-right,
-  #root .leaflet-bottom.leaflet-right,
-  #root .leaflet-top.leaflet-right {
+  /* Use lower specificity so desktop rules can override on larger screens */
+  .leaflet-bottom.leaflet-right,
+  .leaflet-top.leaflet-right {
     top: auto !important;
     bottom: calc(15px + env(safe-area-inset-bottom)) !important;
     bottom: calc(15px + constant(safe-area-inset-bottom)) !important; /* iOS 11.0-11.2 */
@@ -272,14 +269,18 @@ body #root .leaflet-top.leaflet-right {
 
 /* Desktop layout: zoom controls bottom-right, legend to left of zoom, add pin to left of legend */
 /* Use min-width to ensure desktop rules only apply on desktop - PUT THIS AFTER MOBILE */
+/* CRITICAL: Use higher specificity and ensure this overrides mobile rules */
 @media screen and (min-width: 769px) {
   /* Zoom controls stay bottom-right - explicitly override any mobile rules with maximum specificity */
+  /* Use multiple selectors to ensure highest specificity */
   body .leaflet-bottom.leaflet-right,
   body .leaflet-top.leaflet-right,
   html body .leaflet-bottom.leaflet-right,
   html body .leaflet-top.leaflet-right,
-  #root .leaflet-bottom.leaflet-right,
-  #root .leaflet-top.leaflet-right {
+  body #root .leaflet-bottom.leaflet-right,
+  body #root .leaflet-top.leaflet-right,
+  html body #root .leaflet-bottom.leaflet-right,
+  html body #root .leaflet-top.leaflet-right {
     bottom: 20px !important;
     right: 20px !important;
     left: auto !important;
