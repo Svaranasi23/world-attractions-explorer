@@ -1,6 +1,7 @@
 .attraction-search-container {
   position: fixed;
-  top: 15px;
+  top: max(15px, env(safe-area-inset-top, 15px));
+  top: max(15px, constant(safe-area-inset-top)); /* iOS 11.0-11.2 */
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 140px); /* Account for menu (48px) + filter (48px) + margins (44px) */
@@ -132,7 +133,8 @@
 /* Mobile responsive */
 @media (max-width: 768px) {
   .attraction-search-container {
-    top: 12px; /* Align with hamburger and filter icons */
+    top: max(12px, env(safe-area-inset-top, 12px)); /* Align with hamburger and filter icons */
+    top: max(12px, constant(safe-area-inset-top)); /* iOS 11.0-11.2 */
     left: 64px; /* Menu icon (12px + 44px) + 8px gap */
     right: 64px; /* Filter icon (12px + 44px) + 8px gap */
     width: auto; /* Use left/right to define width */
@@ -184,7 +186,8 @@
 /* Small mobile devices */
 @media (max-width: 480px) {
   .attraction-search-container {
-    top: 12px; /* Align with hamburger icon */
+    top: max(12px, env(safe-area-inset-top, 12px)); /* Align with hamburger icon */
+    top: max(12px, constant(safe-area-inset-top)); /* iOS 11.0-11.2 */
     left: 64px; /* Menu icon (12px + 44px) + 8px gap */
     right: 58px; /* Filter icon (10px + 40px) + 8px gap */
     width: auto; /* Use left/right to define width */
@@ -233,7 +236,8 @@
 /* Very small mobile devices */
 @media (max-width: 360px) {
   .attraction-search-container {
-    top: 12px; /* Align with hamburger icon */
+    top: max(12px, env(safe-area-inset-top, 12px)); /* Align with hamburger icon */
+    top: max(12px, constant(safe-area-inset-top)); /* iOS 11.0-11.2 */
     left: 62px; /* Menu icon (12px + 44px) + 6px gap */
     right: 56px; /* Filter icon (10px + 40px) + 6px gap */
     width: auto; /* Use left/right to define width */

@@ -1,8 +1,10 @@
 /* Hamburger Menu Button - Always on the left */
 .hamburger-button {
   position: fixed;
-  top: 15px;
-  left: 15px;
+  top: max(15px, env(safe-area-inset-top, 15px));
+  top: max(15px, constant(safe-area-inset-top)); /* iOS 11.0-11.2 */
+  left: max(15px, env(safe-area-inset-left, 15px));
+  left: max(15px, constant(safe-area-inset-left)); /* iOS 11.0-11.2 */
   right: auto;
   width: 48px;
   height: 48px;
@@ -669,8 +671,10 @@
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .hamburger-button {
-    top: 12px;
-    left: 12px;
+    top: max(12px, env(safe-area-inset-top, 12px));
+    top: max(12px, constant(safe-area-inset-top)); /* iOS 11.0-11.2 */
+    left: max(12px, env(safe-area-inset-left, 12px));
+    left: max(12px, constant(safe-area-inset-left)); /* iOS 11.0-11.2 */
     width: 44px;
     height: 44px;
     min-width: 44px;
@@ -777,8 +781,10 @@
 /* Small mobile devices */
 @media (max-width: 480px) {
   .hamburger-button {
-    top: 10px;
-    left: 10px;
+    top: max(10px, env(safe-area-inset-top, 10px));
+    top: max(10px, constant(safe-area-inset-top)); /* iOS 11.0-11.2 */
+    left: max(10px, env(safe-area-inset-left, 10px));
+    left: max(10px, constant(safe-area-inset-left)); /* iOS 11.0-11.2 */
     width: 40px;
     height: 40px;
     min-width: 40px;
