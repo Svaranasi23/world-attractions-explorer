@@ -12,14 +12,17 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  z-index: 500; /* Lower than tooltips (1008) */
-  display: flex;
+  z-index: 1005 !important; /* High z-index to ensure it's always visible above map and other elements */
+  display: flex !important;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
   transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .hamburger-button:hover {
@@ -672,7 +675,9 @@
     height: 44px;
     min-width: 44px;
     min-height: 44px;
-    z-index: 1004; /* Higher when menu is open to ensure it's accessible */
+    z-index: 1005 !important; /* High z-index to ensure it's always visible on mobile */
+    display: flex !important;
+    pointer-events: auto !important;
   }
 
   .hamburger-icon {
@@ -777,6 +782,9 @@
     width: 40px;
     height: 40px;
     min-width: 40px;
+    z-index: 1005 !important;
+    display: flex !important;
+    pointer-events: auto !important;
     min-height: 40px;
   }
 

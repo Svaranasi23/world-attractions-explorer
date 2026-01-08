@@ -10,8 +10,8 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  z-index: 501; /* Lower than tooltips (1008) but above search (500) */
-  display: flex;
+  z-index: 1004 !important; /* High z-index to ensure it's always visible, but below hamburger (1005) */
+  display: flex !important;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
@@ -19,6 +19,9 @@
   color: white;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Lower z-index when menu is open to prevent overlap */
@@ -259,6 +262,9 @@ body.menu-open .filter-icon-button {
     height: 44px;
     min-width: 44px;
     min-height: 44px;
+    z-index: 1004 !important;
+    display: flex !important;
+    pointer-events: auto !important;
   }
 
   .attraction-type-filter-panel {
@@ -315,6 +321,9 @@ body.menu-open .filter-icon-button {
     height: 40px;
     min-width: 40px;
     min-height: 40px;
+    z-index: 1004 !important;
+    display: flex !important;
+    pointer-events: auto !important;
   }
 
   .attraction-type-filter-panel {
