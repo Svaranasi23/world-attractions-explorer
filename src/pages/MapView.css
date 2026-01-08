@@ -189,10 +189,10 @@
 
 @media (max-width: 768px) {
   .leaflet-top.leaflet-right {
-    bottom: max(15px, env(safe-area-inset-bottom, 15px)) !important;
-    bottom: max(15px, constant(safe-area-inset-bottom)) !important; /* iOS 11.0-11.2 */
-    right: max(15px, env(safe-area-inset-right, 15px)) !important;
-    right: max(15px, constant(safe-area-inset-right)) !important; /* iOS 11.0-11.2 */
+    bottom: calc(15px + env(safe-area-inset-bottom)) !important;
+    bottom: calc(15px + constant(safe-area-inset-bottom)) !important; /* iOS 11.0-11.2 */
+    right: calc(15px + env(safe-area-inset-right)) !important;
+    right: calc(15px + constant(safe-area-inset-right)) !important; /* iOS 11.0-11.2 */
   }
 }
 
@@ -287,10 +287,10 @@
 /* Pin Mode Toggle Button */
 .pin-mode-toggle {
   position: fixed;
-  bottom: max(20px, env(safe-area-inset-bottom, 20px));
-  bottom: max(20px, constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
-  left: max(20px, env(safe-area-inset-left, 20px));
-  left: max(20px, constant(safe-area-inset-left)); /* iOS 11.0-11.2 */
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  bottom: calc(20px + constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
+  left: calc(20px + env(safe-area-inset-left));
+  left: calc(20px + constant(safe-area-inset-left)); /* iOS 11.0-11.2 */
   z-index: 1003; /* Above legend (1002) and zoom controls */
   padding: 12px 20px;
   background-color: #666;
@@ -348,10 +348,10 @@
 /* Adjust position on mobile */
 @media (max-width: 768px) {
   .pin-mode-toggle {
-    bottom: max(15px, env(safe-area-inset-bottom, 15px));
-    bottom: max(15px, constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
-    left: max(15px, env(safe-area-inset-left, 15px));
-    left: max(15px, constant(safe-area-inset-left)); /* iOS 11.0-11.2 */
+    bottom: calc(15px + env(safe-area-inset-bottom));
+    bottom: calc(15px + constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
+    left: calc(15px + env(safe-area-inset-left));
+    left: calc(15px + constant(safe-area-inset-left)); /* iOS 11.0-11.2 */
     padding: 10px 16px;
     font-size: 12px;
   }

@@ -1,9 +1,9 @@
 .map-legend-container {
   position: fixed;
-  bottom: max(20px, env(safe-area-inset-bottom, 20px));
-  bottom: max(20px, constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
-  right: max(80px, calc(80px + env(safe-area-inset-right, 0px)));
-  right: max(80px, calc(80px + constant(safe-area-inset-right))); /* iOS 11.0-11.2 */
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  bottom: calc(20px + constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
+  right: calc(80px + env(safe-area-inset-right));
+  right: calc(80px + constant(safe-area-inset-right)); /* iOS 11.0-11.2 */
   z-index: 1002; /* Same as zoom controls */
 }
 
@@ -185,10 +185,10 @@ body.menu-open .map-legend-content {
 /* Mobile responsive */
 @media (max-width: 768px) {
   .map-legend-container {
-    bottom: max(15px, env(safe-area-inset-bottom, 15px));
-    bottom: max(15px, constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
-    right: max(70px, calc(70px + env(safe-area-inset-right, 0px)));
-    right: max(70px, calc(70px + constant(safe-area-inset-right))); /* iOS 11.0-11.2 */
+    bottom: calc(15px + env(safe-area-inset-bottom));
+    bottom: calc(15px + constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
+    right: calc(70px + env(safe-area-inset-right));
+    right: calc(70px + constant(safe-area-inset-right)); /* iOS 11.0-11.2 */
   }
 
   .map-legend-toggle {
@@ -260,10 +260,10 @@ body.menu-open .map-legend-content {
 /* Small mobile devices */
 @media (max-width: 480px) {
   .map-legend-container {
-    bottom: max(15px, env(safe-area-inset-bottom, 15px));
-    bottom: max(15px, constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
-    right: max(65px, calc(65px + env(safe-area-inset-right, 0px)));
-    right: max(65px, calc(65px + constant(safe-area-inset-right))); /* iOS 11.0-11.2 */
+    bottom: calc(15px + env(safe-area-inset-bottom));
+    bottom: calc(15px + constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
+    right: calc(65px + env(safe-area-inset-right));
+    right: calc(65px + constant(safe-area-inset-right)); /* iOS 11.0-11.2 */
   }
 
   .map-legend-toggle {
@@ -318,10 +318,10 @@ body.menu-open .map-legend-content {
 /* Very small mobile devices */
 @media (max-width: 360px) {
   .map-legend-container {
-    bottom: max(12px, env(safe-area-inset-bottom, 12px));
-    bottom: max(12px, constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
-    right: max(60px, calc(60px + env(safe-area-inset-right, 0px)));
-    right: max(60px, calc(60px + constant(safe-area-inset-right))); /* iOS 11.0-11.2 */
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    bottom: calc(12px + constant(safe-area-inset-bottom)); /* iOS 11.0-11.2 */
+    right: calc(60px + env(safe-area-inset-right));
+    right: calc(60px + constant(safe-area-inset-right)); /* iOS 11.0-11.2 */
   }
 
   .map-legend-toggle {
