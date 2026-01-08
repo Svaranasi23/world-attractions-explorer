@@ -1,0 +1,57 @@
+Park_Code,Name,Designation,States,Latitude,Longitude,Description,URL,Country
+KRU,Kruger National Park,National Park,"Limpopo, Mpumalanga",-23.9883,31.5547,"One of Africa's largest game reserves, home to the Big Five.",https://en.wikipedia.org/wiki/Kruger_National_Park,South Africa
+TAB,Table Mountain National Park,National Park,Western Cape,-33.9500,18.4167,"Includes Table Mountain, Cape of Good Hope, and Silvermine.",https://en.wikipedia.org/wiki/Table_Mountain_National_Park,South Africa
+GAR,Garden Route National Park,National Park,"Western Cape, Eastern Cape",-33.9833,23.0167,"Combines Tsitsikamma, Knysna, and Wilderness areas.",https://en.wikipedia.org/wiki/Garden_Route_National_Park,South Africa
+KGA,Kgalagadi Transfrontier Park,National Park,Northern Cape,-25.7667,20.3833,"Transfrontier park shared with Botswana, known for Kalahari lions.",https://en.wikipedia.org/wiki/Kgalagadi_Transfrontier_Park,South Africa
+ADDO,Addo Elephant National Park,National Park,Eastern Cape,-33.5000,25.7500,Home to over 600 elephants and the Big Seven.,https://en.wikipedia.org/wiki/Addo_Elephant_National_Park,South Africa
+PIL,Pilanesberg National Park,National Park,North West,-25.2500,27.0833,Located in an extinct volcanic crater.,https://en.wikipedia.org/wiki/Pilanesberg_National_Park,South Africa
+HLO,Hluhluwe-Imfolozi Park,National Park,KwaZulu-Natal,-28.2333,31.9833,"Oldest proclaimed nature reserve in Africa, home to white rhinos.",https://en.wikipedia.org/wiki/Hluhluwe-Imfolozi_Park,South Africa
+MASA,Maasai Mara National Reserve,National Park,Narok,-1.5000,35.0000,Famous for the Great Migration and big cat populations.,https://en.wikipedia.org/wiki/Maasai_Mara_National_Reserve,Kenya
+AMB,Amboseli National Park,National Park,Kajiado,-2.6500,37.2500,Known for large elephant herds with Mount Kilimanjaro backdrop.,https://en.wikipedia.org/wiki/Amboseli_National_Park,Kenya
+TSAV,Tsavo East National Park,National Park,Taita-Taveta,-2.7833,38.7667,"One of Kenya's largest parks, home to red elephants.",https://en.wikipedia.org/wiki/Tsavo_East_National_Park,Kenya
+TSAW,Tsavo West National Park,National Park,Taita-Taveta,-3.0000,38.0000,Known for Mzima Springs and diverse wildlife.,https://en.wikipedia.org/wiki/Tsavo_West_National_Park,Kenya
+NAK,Nairobi National Park,National Park,Nairobi,-1.3667,36.8333,World's only national park within a capital city.,https://en.wikipedia.org/wiki/Nairobi_National_Park,Kenya
+HELL,Hell's Gate National Park,National Park,Nakuru,-0.9167,36.3167,Known for geothermal activity and rock climbing.,https://en.wikipedia.org/wiki/Hell's_Gate_National_Park,Kenya
+ABER,Aberdare National Park,National Park,"Nyeri, Nyandarua",-0.4167,36.6667,Mountainous park with diverse wildlife and waterfalls.,https://en.wikipedia.org/wiki/Aberdare_National_Park,Kenya
+SERE,Serengeti National Park,National Park,"Mara, Arusha",-2.3333,34.8333,Famous for the annual wildebeest migration of over 1.5 million animals.,https://en.wikipedia.org/wiki/Serengeti_National_Park,Tanzania
+NGOR,Ngorongoro Conservation Area,National Park,Arusha,-3.1833,35.5500,UNESCO World Heritage Site with the largest intact caldera.,https://en.wikipedia.org/wiki/Ngorongoro_Conservation_Area,Tanzania
+KILI,Kilimanjaro National Park,National Park,Kilimanjaro,-3.0667,37.3500,"Home to Mount Kilimanjaro, Africa's highest peak.",https://en.wikipedia.org/wiki/Kilimanjaro_National_Park,Tanzania
+TARA,Tarangire National Park,National Park,Manyara,-3.8333,36.0000,Known for large elephant herds and baobab trees.,https://en.wikipedia.org/wiki/Tarangire_National_Park,Tanzania
+LAKE,Lake Manyara National Park,National Park,Manyara,-3.5000,35.8333,Famous for tree-climbing lions and diverse birdlife.,https://en.wikipedia.org/wiki/Lake_Manyara_National_Park,Tanzania
+ARUS,Arusha National Park,National Park,Arusha,-3.2500,36.8333,Small park with Mount Meru and diverse wildlife.,https://en.wikipedia.org/wiki/Arusha_National_Park,Tanzania
+RUA,Ruaha National Park,National Park,Iringa,-7.8333,34.8333,"Tanzania's largest national park, known for elephants and wild dogs.",https://en.wikipedia.org/wiki/Ruaha_National_Park,Tanzania
+CHOB,Chobe National Park,National Park,Chobe,-18.6667,24.5000,Renowned for large elephant herds and diverse wildlife along the Chobe River.,https://en.wikipedia.org/wiki/Chobe_National_Park,Botswana
+OKAV,Okavango Delta,National Park,North West,-19.2833,22.7500,"UNESCO World Heritage Site, world's largest inland delta.",https://en.wikipedia.org/wiki/Okavango_Delta,Botswana
+MOR,Moremi Game Reserve,National Park,North West,-19.1667,23.0833,First reserve in Africa established by local residents.,https://en.wikipedia.org/wiki/Moremi_Game_Reserve,Botswana
+KGAL,Kgalagadi Transfrontier Park,National Park,Kgalagadi,-25.7667,20.3833,"Transfrontier park shared with South Africa, Kalahari desert ecosystem.",https://en.wikipedia.org/wiki/Kgalagadi_Transfrontier_Park,Botswana
+ETOS,Etosha National Park,National Park,"Kunene, Oshikoto",-18.9167,16.3333,"Centered around a vast salt pan, home to diverse wildlife including rhinos and lions.",https://en.wikipedia.org/wiki/Etosha_National_Park,Namibia
+NAUK,Namib-Naukluft National Park,National Park,"Erongo, Hardap",-24.7500,15.3000,"One of the largest national parks in Africa, includes Sossusvlei dunes.",https://en.wikipedia.org/wiki/Namib-Naukluft_National_Park,Namibia
+FISH,Fish River Canyon Park,National Park,Karas,-27.5833,17.6000,Home to the second largest canyon in the world.,https://en.wikipedia.org/wiki/Fish_River_Canyon_Park,Namibia
+SKEL,Skeleton Coast National Park,National Park,"Kunene, Erongo",-20.5000,13.5000,Famous for shipwrecks and desert-adapted wildlife.,https://en.wikipedia.org/wiki/Skeleton_Coast_National_Park,Namibia
+SOUL,South Luangwa National Park,National Park,Eastern Province,-13.0000,31.5000,Known for walking safaris and high density of leopards.,https://en.wikipedia.org/wiki/South_Luangwa_National_Park,Zambia
+LOWE,Lower Zambezi National Park,National Park,"Lusaka, Central",-15.6667,29.5000,Beautiful park along the Zambezi River with excellent game viewing.,https://en.wikipedia.org/wiki/Lower_Zambezi_National_Park,Zambia
+KAFU,Kafue National Park,National Park,"Central, Northwestern, Southern",-15.0000,25.7500,"Zambia's largest national park, diverse ecosystems.",https://en.wikipedia.org/wiki/Kafue_National_Park,Zambia
+HWAN,Hwange National Park,National Park,Matabeleland North,-19.0000,26.5000,"Zimbabwe's largest national park, home to one of the largest elephant populations.",https://en.wikipedia.org/wiki/Hwange_National_Park,Zimbabwe
+MANA,Mana Pools National Park,National Park,Mashonaland West,-15.7500,29.3333,"UNESCO World Heritage Site, known for walking safaris and large mammals.",https://en.wikipedia.org/wiki/Mana_Pools_National_Park,Zimbabwe
+MATO,Matobo National Park,National Park,Matabeleland South,-20.5000,28.5000,Known for balancing rocks and ancient rock art.,https://en.wikipedia.org/wiki/Matobo_National_Park,Zimbabwe
+BWIN,Bwindi Impenetrable National Park,National Park,"Kanungu, Kisoro",-1.0000,29.6667,"UNESCO World Heritage Site, home to half of the world's mountain gorillas.",https://en.wikipedia.org/wiki/Bwindi_Impenetrable_National_Park,Uganda
+MGAH,Mgahinga Gorilla National Park,National Park,Kisoro,-1.3667,29.6500,"Part of the Virunga Conservation Area, home to mountain gorillas.",https://en.wikipedia.org/wiki/Mgahinga_Gorilla_National_Park,Uganda
+QUEEN,Queen Elizabeth National Park,National Park,"Kasese, Kamwenge",-0.2500,30.0000,"Uganda's most visited park, diverse ecosystems and wildlife.",https://en.wikipedia.org/wiki/Queen_Elizabeth_National_Park,Uganda
+MURC,Murchison Falls National Park,National Park,"Masindi, Nwoya",2.2500,31.7500,Home to the powerful Murchison Falls and diverse wildlife.,https://en.wikipedia.org/wiki/Murchison_Falls_National_Park,Uganda
+VOLC,Volcanoes National Park,National Park,Northern Province,-1.5000,29.5000,"Home to mountain gorillas, made famous by Dian Fossey.",https://en.wikipedia.org/wiki/Volcanoes_National_Park,Rwanda
+AKAG,Akagera National Park,National Park,Eastern Province,-1.8333,30.7500,"Rwanda's only savannah park, home to the Big Five.",https://en.wikipedia.org/wiki/Akagera_National_Park,Rwanda
+NYUN,Nyungwe Forest National Park,National Park,Western Province,-2.5000,29.2500,"Ancient montane rainforest, home to chimpanzees and colobus monkeys.",https://en.wikipedia.org/wiki/Nyungwe_Forest_National_Park,Rwanda
+SIMM,Simien Mountains National Park,National Park,Amhara,13.2500,38.2500,"UNESCO World Heritage Site, home to gelada baboons and Ethiopian wolves.",https://en.wikipedia.org/wiki/Simien_Mountains_National_Park,Ethiopia
+BALE,Bale Mountains National Park,National Park,Oromia,6.7500,39.7500,Home to the largest population of Ethiopian wolves and mountain nyala.,https://en.wikipedia.org/wiki/Bale_Mountains_National_Park,Ethiopia
+AWASH,Awash National Park,National Park,"Afar, Oromia",9.0000,40.0000,"First national park in Ethiopia, diverse wildlife and landscapes.",https://en.wikipedia.org/wiki/Awash_National_Park,Ethiopia
+TOUB,Toubkal National Park,National Park,Marrakesh-Safi,31.0833,-7.9167,"Home to Mount Toubkal, North Africa's highest peak.",https://en.wikipedia.org/wiki/Toubkal_National_Park,Morocco
+IFRA,Ifrane National Park,National Park,Fès-Meknès,33.5000,-5.1000,Known for Atlas cedar forests and Barbary macaques.,https://en.wikipedia.org/wiki/Ifrane_National_Park,Morocco
+RAS,Ras Mohammed National Park,National Park,South Sinai,27.7167,34.2500,"Marine park at the tip of the Sinai Peninsula, world-class diving.",https://en.wikipedia.org/wiki/Ras_Mohammed_National_Park,Egypt
+WHITE,White Desert National Park,National Park,New Valley,27.2500,28.7500,Famous for white chalk rock formations shaped by wind erosion.,https://en.wikipedia.org/wiki/White_Desert_National_Park,Egypt
+ANDA,Andasibe-Mantadia National Park,National Park,Alaotra-Mangoro,-18.8333,48.4167,Known for indri lemurs and lush rainforests.,https://en.wikipedia.org/wiki/Andasibe-Mantadia_National_Park,Madagascar
+ISAL,Isalo National Park,National Park,Ihorombe,-22.4167,45.3333,Known for dramatic sandstone formations and canyons.,https://en.wikipedia.org/wiki/Isalo_National_Park,Madagascar
+RANO,Ranomafana National Park,National Park,Vatovavy-Fitovinany,-21.2500,47.4167,"Tropical rainforest park, home to 12 species of lemurs.",https://en.wikipedia.org/wiki/Ranomafana_National_Park,Madagascar
+LOAN,Loango National Park,National Park,Ogooué-Maritime,-2.0833,9.5833,"Dubbed ""Africa's Last Eden,"" unique blend of rainforest and ocean ecosystems.",https://en.wikipedia.org/wiki/Loango_National_Park,Gabon
+IVIN,Ivindo National Park,National Park,Ogooué-Ivindo,0.1667,12.7500,"UNESCO World Heritage Site, home to Kongou Falls and diverse wildlife.",https://en.wikipedia.org/wiki/Ivindo_National_Park,Gabon
+WAZA,Waza National Park,National Park,Far North,11.3333,14.6667,"UNESCO Biosphere Reserve, home to lions, elephants, and various bird species.",https://en.wikipedia.org/wiki/Waza_National_Park,Cameroon
+KORU,Korup National Park,National Park,Southwest,5.0833,8.8333,One of Africa's oldest and most biodiverse rainforests.,https://en.wikipedia.org/wiki/Korup_National_Park,Cameroon

@@ -34,7 +34,7 @@ export const loadCSVData = async (filename) => {
  */
 export const loadParksData = async () => {
   try {
-    const [usParks, usMostPhotographed, canadianParks, canadianMostPhotographed, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMatham, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, costaRicaUnescoSites, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, northKoreaUnescoSites, mongoliaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites, usUnescoSites, canadaUnescoSites, asiaMostPhotographed] = await Promise.all([
+    const [usParks, usMostPhotographed, canadianParks, canadianMostPhotographed, indianParks, indianUnescoSites, indianJyotirlinga, indianShaktiPeethas, indianOtherTemples, indianMatham, indianDivyaDesams, indianForts, nepalParks, nepalTemples, nepalUnescoSites, nepalTrekkingFlights, sriLankaParks, sriLankaTemples, sriLankaUnescoSites, costaRicaParks, costaRicaUnescoSites, africanParks, chinaUnescoSites, japanUnescoSites, southKoreaUnescoSites, northKoreaUnescoSites, mongoliaUnescoSites, thailandUnescoSites, indonesiaUnescoSites, vietnamUnescoSites, cambodiaUnescoSites, myanmarUnescoSites, philippinesUnescoSites, malaysiaUnescoSites, singaporeUnescoSites, laosUnescoSites, bruneiUnescoSites, eastTimorUnescoSites, bangladeshUnescoSites, pakistanUnescoSites, afghanistanUnescoSites, bhutanUnescoSites, maldivesUnescoSites, kazakhstanUnescoSites, kyrgyzstanUnescoSites, tajikistanUnescoSites, turkmenistanUnescoSites, uzbekistanUnescoSites, iranUnescoSites, iraqUnescoSites, jordanUnescoSites, lebanonUnescoSites, saudiArabiaUnescoSites, syriaUnescoSites, turkeyUnescoSites, uaeUnescoSites, yemenUnescoSites, omanUnescoSites, qatarUnescoSites, kuwaitUnescoSites, bahrainUnescoSites, israelUnescoSites, palestineUnescoSites, belizeUnescoSites, guatemalaUnescoSites, hondurasUnescoSites, elSalvadorUnescoSites, nicaraguaUnescoSites, panamaUnescoSites, mexicoUnescoSites, usUnescoSites, canadaUnescoSites, asiaMostPhotographed] = await Promise.all([
       loadCSVData('US_National_Parks.csv'),
       loadCSVData('US_Most_Photographed_Places.csv').catch(() => []),
       loadCSVData('Canadian_National_Parks.csv').catch(() => []),
@@ -56,6 +56,8 @@ export const loadParksData = async () => {
       loadCSVData('Sri_Lanka_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Costa_Rica_National_Parks.csv').catch(() => []),
       loadCSVData('Costa_Rica_UNESCO_Sites.csv').catch(() => []),
+      // Africa
+      loadCSVData('African_National_Parks.csv').catch(() => []),
       // East Asia
       loadCSVData('China_UNESCO_Sites.csv').catch(() => []),
       loadCSVData('Japan_UNESCO_Sites.csv').catch(() => []),
@@ -452,6 +454,20 @@ export const loadParksData = async () => {
       id: `cr-unesco-${site.Park_Code || Math.random()}`
     }))
     
+    // Process African parks
+    const processedAfricanParks = africanParks.map(park => ({
+      Park_Code: park.Park_Code || '',
+      Name: park.Name || '',
+      Designation: park.Designation || 'National Park',
+      States: park.States || '',
+      Latitude: park.Latitude || '0',
+      Longitude: park.Longitude || '0',
+      Description: park.Description || `African National Park in ${park.States || ''}`,
+      URL: park.URL || '',
+      Country: park.Country || '',
+      id: `af-${park.Park_Code || Math.random()}`
+    }))
+    
     // Process Asian UNESCO sites
     const processedChinaUnesco = chinaUnescoSites.map(site => ({
       Park_Code: site.Park_Code || '',
@@ -727,6 +743,7 @@ export const loadParksData = async () => {
       ...processedNepalParks, ...processedNepalTemples, ...processedNepalUnesco, ...processedNepalTrekkingFlights, 
       ...processedSriLankaParks, ...processedSriLankaTemples, ...processedSriLankaUnesco, 
       ...processedCostaRicaParks, ...processedCostaRicaUnesco, 
+      ...processedAfricanParks,
       // East Asia
       ...processedChinaUnesco, ...processedJapanUnesco, ...processedSouthKoreaUnesco, ...processedNorthKoreaUnesco, ...processedMongoliaUnesco,
       // South East Asia
@@ -879,6 +896,7 @@ export const categorizeParksByRegion = (parks) => {
     'Sri Lanka-Temples': [],
     'Sri Lanka-UNESCO': [],
     'Costa Rica': [],
+    'Africa': [],
     'SouthEastAsia-UNESCO': [],
     'EastAsia-UNESCO': [],
     'SouthAsia-UNESCO': [],
@@ -938,6 +956,9 @@ export const categorizeParksByRegion = (parks) => {
       }
     } else if (country === 'Costa Rica') {
       regions['Costa Rica'].push(park)
+    } else if (['South Africa', 'Kenya', 'Tanzania', 'Botswana', 'Namibia', 'Zambia', 'Zimbabwe', 'Uganda', 'Rwanda', 'Ethiopia', 'Morocco', 'Egypt', 'Madagascar', 'Gabon', 'Cameroon', 'Algeria', 'Angola', 'Benin', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Central African Republic', 'Chad', 'Comoros', 'Congo', 'Côte d\'Ivoire', 'Democratic Republic of the Congo', 'Djibouti', 'Equatorial Guinea', 'Eritrea', 'Eswatini', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau', 'Lesotho', 'Liberia', 'Libya', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Mozambique', 'Niger', 'Nigeria', 'São Tomé and Príncipe', 'Senegal', 'Seychelles', 'Sierra Leone', 'Somalia', 'South Sudan', 'Sudan', 'Togo', 'Tunisia'].includes(country)) {
+      // African countries
+      regions['Africa'].push(park)
     } else if (['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor'].includes(country)) {
       // South East Asian countries
       regions['SouthEastAsia-UNESCO'].push(park)

@@ -207,6 +207,7 @@ function MapView() {
     'Sri Lanka-Temples': true,
     'Sri Lanka-UNESCO': true,
     'Costa Rica': true,
+    'Africa': true,
     'SouthEastAsia-UNESCO': true,
     'EastAsia-UNESCO': true,
     'SouthAsia-UNESCO': true,
@@ -762,6 +763,9 @@ function MapView() {
         }
       } else if (country === 'Costa Rica') {
         region = 'Costa Rica'
+      } else if (['South Africa', 'Kenya', 'Tanzania', 'Botswana', 'Namibia', 'Zambia', 'Zimbabwe', 'Uganda', 'Rwanda', 'Ethiopia', 'Morocco', 'Egypt', 'Madagascar', 'Gabon', 'Cameroon', 'Algeria', 'Angola', 'Benin', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Central African Republic', 'Chad', 'Comoros', 'Congo', 'Côte d\'Ivoire', 'Democratic Republic of the Congo', 'Djibouti', 'Equatorial Guinea', 'Eritrea', 'Eswatini', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau', 'Lesotho', 'Liberia', 'Libya', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Mozambique', 'Niger', 'Nigeria', 'São Tomé and Príncipe', 'Senegal', 'Seychelles', 'Sierra Leone', 'Somalia', 'South Sudan', 'Sudan', 'Togo', 'Tunisia'].includes(country)) {
+        // African countries
+        region = 'Africa'
       } else if (['Thailand', 'Indonesia', 'Vietnam', 'Cambodia', 'Myanmar', 'Philippines', 'Malaysia', 'Singapore', 'Laos', 'Brunei', 'East Timor'].includes(country)) {
         // South East Asian countries
         region = 'SouthEastAsia-UNESCO'
@@ -2204,6 +2208,8 @@ function MapView() {
             locationLabel = 'Province'
           } else if (country === 'Costa Rica') {
             locationLabel = 'Province(s)'
+          } else if (['South Africa', 'Kenya', 'Tanzania', 'Botswana', 'Namibia', 'Zambia', 'Zimbabwe', 'Uganda', 'Rwanda', 'Ethiopia', 'Morocco', 'Egypt', 'Madagascar', 'Gabon', 'Cameroon'].includes(country)) {
+            locationLabel = 'Region'
           }
           
           // Determine if country uses metric system (all except US)

@@ -268,6 +268,19 @@ function FilterPanel({ regions, visibleRegions, toggleRegion, toggleAllUSRegions
                           </label>
                         )}
 
+                        {/* Africa National Parks */}
+                        {regions['Africa'] && regions['Africa'].length > 0 && (
+                          <label key="Africa" className="filter-item africa-item">
+                            <input
+                              type="checkbox"
+                              checked={visibleRegions['Africa'] !== false}
+                              onChange={(e) => handleRegionToggle('Africa', e.target.checked)}
+                            />
+                            <strong style={{ color: '#ff9800' }}>🌍 Africa</strong> ({regions['Africa'].length} parks)
+                            <InfoTooltip countries={getRegionCountries('Africa')} />
+                          </label>
+                        )}
+
                         {/* Central America UNESCO Sites */}
                         {regions['CentralAmerica-UNESCO'] && regions['CentralAmerica-UNESCO'].length > 0 && (
                           <label key="CentralAmerica-UNESCO" className="filter-item central-america-item">
