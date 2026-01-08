@@ -260,6 +260,39 @@
   }
 }
 
+/* Desktop layout: zoom controls bottom-right, legend to left of zoom, add pin to left of legend */
+/* Use min-width to ensure desktop rules only apply on desktop - PUT THIS AFTER MOBILE */
+@media screen and (min-width: 769px) {
+  /* Zoom controls stay bottom-right - explicitly override any mobile rules */
+  .leaflet-bottom.leaflet-right,
+  .leaflet-top.leaflet-right {
+    bottom: 20px !important;
+    right: 20px !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: 1006 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* When menu is open, move zoom controls left */
+  body.menu-open .leaflet-bottom.leaflet-right,
+  body.menu-open .leaflet-top.leaflet-right {
+    right: 370px !important; /* 350px menu + 20px gap */
+    left: auto !important;
+  }
+  
+  /* Add pin button: position to left of legend (legend is at ~80px from right, width ~100px) */
+  .pin-mode-toggle {
+    bottom: 20px !important;
+    left: auto !important;
+    right: 220px !important; /* Left of legend: 80px (legend right) + 100px (legend width) + 40px (gap) */
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
 /* Ensure Leaflet popups and markers appear above UI controls */
 .leaflet-popup-pane {
   z-index: 1010 !important;
