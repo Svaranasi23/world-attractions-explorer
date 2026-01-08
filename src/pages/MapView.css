@@ -227,11 +227,11 @@
     left: auto !important;
   }
   
-  /* Add pin button: position to left of legend (legend is at ~80px from right) */
+  /* Add pin button: position to left of legend (legend is at ~80px from right, width ~100px) */
   .pin-mode-toggle {
     bottom: 20px !important;
     left: auto !important;
-    right: 200px !important; /* Left of legend (~80px) + legend width (~100px) + gap */
+    right: 220px !important; /* Left of legend: 80px (legend right) + 100px (legend width) + 40px (gap) */
     padding: 8px 12px;
     font-size: 12px;
   }
