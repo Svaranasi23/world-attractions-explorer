@@ -212,9 +212,10 @@ html body #root .leaflet-top.leaflet-right {
 }
 
 /* Mobile layout: zoom controls bottom-left, legend bottom-right, add pin above zoom on left */
-/* Use max-width to ensure mobile rules only apply on mobile - PUT THIS FIRST */
-/* IMPORTANT: Lower specificity than desktop so desktop can override */
-@media screen and (max-width: 768px) {
+/* Use max-width with pointer:coarse to target touch devices, or very small screens */
+/* IMPORTANT: Only apply on actual mobile devices, not desktop browsers */
+@media screen and (max-width: 768px) and (pointer: coarse),
+       screen and (max-width: 480px) {
   /* On mobile, move zoom controls to bottom-left to avoid safe area issues */
   /* Use lower specificity so desktop rules can override on larger screens */
   .leaflet-bottom.leaflet-right,
@@ -271,7 +272,10 @@ html body #root .leaflet-top.leaflet-right {
 /* Desktop layout: zoom controls bottom-right, legend to left of zoom, add pin to left of legend */
 /* Use min-width to ensure desktop rules only apply on desktop - PUT THIS AFTER MOBILE */
 /* CRITICAL: Use higher specificity and ensure this overrides mobile rules */
-@media screen and (min-width: 769px) {
+/* Also target non-touch devices explicitly */
+@media screen and (min-width: 769px),
+       screen and (min-width: 1024px),
+       (pointer: fine) and (min-width: 769px) {
   /* Zoom controls stay bottom-right - explicitly override any mobile rules with maximum specificity */
   /* Use multiple selectors to ensure highest specificity */
   body .leaflet-bottom.leaflet-right,
