@@ -161,8 +161,11 @@
 }
 
 /* CRITICAL: Force zoom controls to bottom-right on desktop - use highest specificity */
-/* Default positioning - will be overridden by media queries */
-.leaflet-bottom.leaflet-right {
+/* Use body/html selectors to ensure this overrides Leaflet's default CSS in production builds */
+body .leaflet-bottom.leaflet-right,
+html body .leaflet-bottom.leaflet-right,
+#root .leaflet-bottom.leaflet-right,
+body #root .leaflet-bottom.leaflet-right {
   bottom: 20px !important;
   right: 20px !important;
   left: auto !important;
@@ -174,7 +177,10 @@
 }
 
 /* Also handle .leaflet-top.leaflet-right in case it's used */
-.leaflet-top.leaflet-right {
+body .leaflet-top.leaflet-right,
+html body .leaflet-top.leaflet-right,
+#root .leaflet-top.leaflet-right,
+body #root .leaflet-top.leaflet-right {
   top: auto !important;
   bottom: 20px !important;
   right: 20px !important;
@@ -208,9 +214,13 @@
 /* Use max-width to ensure mobile rules only apply on mobile - PUT THIS FIRST */
 @media screen and (max-width: 768px) {
   /* On mobile, move zoom controls to bottom-left to avoid safe area issues */
-  /* Use maximum specificity to override desktop rules */
-  .leaflet-bottom.leaflet-right,
-  .leaflet-top.leaflet-right {
+  /* Use maximum specificity to override desktop rules and Leaflet defaults */
+  body .leaflet-bottom.leaflet-right,
+  body .leaflet-top.leaflet-right,
+  html body .leaflet-bottom.leaflet-right,
+  html body .leaflet-top.leaflet-right,
+  #root .leaflet-bottom.leaflet-right,
+  #root .leaflet-top.leaflet-right {
     top: auto !important;
     bottom: calc(15px + env(safe-area-inset-bottom)) !important;
     bottom: calc(15px + constant(safe-area-inset-bottom)) !important; /* iOS 11.0-11.2 */
@@ -263,9 +273,13 @@
 /* Desktop layout: zoom controls bottom-right, legend to left of zoom, add pin to left of legend */
 /* Use min-width to ensure desktop rules only apply on desktop - PUT THIS AFTER MOBILE */
 @media screen and (min-width: 769px) {
-  /* Zoom controls stay bottom-right - explicitly override any mobile rules */
-  .leaflet-bottom.leaflet-right,
-  .leaflet-top.leaflet-right {
+  /* Zoom controls stay bottom-right - explicitly override any mobile rules with maximum specificity */
+  body .leaflet-bottom.leaflet-right,
+  body .leaflet-top.leaflet-right,
+  html body .leaflet-bottom.leaflet-right,
+  html body .leaflet-top.leaflet-right,
+  #root .leaflet-bottom.leaflet-right,
+  #root .leaflet-top.leaflet-right {
     bottom: 20px !important;
     right: 20px !important;
     left: auto !important;
